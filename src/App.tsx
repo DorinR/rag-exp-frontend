@@ -1,67 +1,90 @@
+import { MoonIcon, SunIcon } from '@radix-ui/react-icons';
+import { Box, Button, Card, Container, Flex, Heading, IconButton, Text } from '@radix-ui/themes';
 import { useState } from 'react';
 import reactLogo from './assets/react.svg';
-import { cn } from './utils/cn';
+import TestPage from './pages/TestPage';
+import { ThemeProvider, useTheme } from './providers/ThemeProvider';
 import viteLogo from '/vite.svg';
+
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  return (
+    <Flex align="center" gap="2">
+      {theme === 'dark' ? <MoonIcon /> : <SunIcon />}
+      <IconButton
+        variant="soft"
+        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        radius="full"
+      >
+        {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+      </IconButton>
+    </Flex>
+  );
+}
 
 function App() {
   const [count, setCount] = useState(0);
-  const [darkMode, setDarkMode] = useState(false);
+  const [showTestPage, setShowTestPage] = useState(false);
+
+  if (showTestPage) {
+    return (
+      <ThemeProvider>
+        <TestPage />
+      </ThemeProvider>
+    );
+  }
 
   return (
-    <div
-      className={cn(
-        'flex min-h-screen flex-col items-center justify-center py-2',
-        darkMode ? 'bg-gray-900' : 'bg-gray-100'
-      )}
-    >
-      <div className="flex gap-20">
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="h-24 w-24 animate-pulse" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="h-24 w-24 animate-spin" alt="React logo" />
-        </a>
-      </div>
-      <h1 className={cn('mt-6 text-4xl font-bold', darkMode ? 'text-white' : 'text-gray-900')}>
-        Vite + React + Tailwind
-      </h1>
-      <div
-        className={cn(
-          'mt-6 rounded-xl border p-6 shadow-md',
-          darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
-        )}
-      >
-        <div className="mb-4 flex justify-between">
-          <button
-            onClick={() => setCount(count => count + 1)}
-            className="rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none"
-          >
-            count is {count}
-          </button>
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="rounded-lg bg-purple-600 px-4 py-2 font-medium text-white hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:outline-none"
-          >
-            {darkMode ? 'Light Mode' : 'Dark Mode'}
-          </button>
-        </div>
-        <p className={cn('mt-4', darkMode ? 'text-gray-300' : 'text-gray-700')}>
-          Edit{' '}
-          <code
-            className={cn(
-              'rounded p-1 font-mono text-sm',
-              darkMode ? 'bg-gray-700' : 'bg-gray-100'
-            )}
-          >
-            src/App.tsx
-          </code>{' '}
-          and save to test HMR
-        </p>
-      </div>
-      <p className={cn('mt-6 text-sm', darkMode ? 'text-gray-400' : 'text-gray-600')}>
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
+    <ThemeProvider>
+      <Container>
+        <Flex direction="column" align="center" justify="center" py="9" gap="6">
+          <Flex gap="8">
+            <a href="https://vite.dev" target="_blank">
+              <Box className="animate-pulse">
+                <img src={viteLogo} width={96} height={96} alt="Vite logo" />
+              </Box>
+            </a>
+            <a href="https://react.dev" target="_blank">
+              <Box className="animate-spin">
+                <img src={reactLogo} width={96} height={96} alt="React logo" />
+              </Box>
+            </a>
+          </Flex>
+          <Heading size="8" align="center">
+            Vite + React + Radix UI
+          </Heading>
+          <Card size="3" style={{ width: '100%', maxWidth: '500px' }}>
+            <Flex direction="column" gap="4">
+              <Flex justify="between">
+                <Button onClick={() => setCount(count => count + 1)}>count is {count}</Button>
+                <ThemeToggle />
+              </Flex>
+              <Text as="p" color="gray">
+                Edit{' '}
+                <code
+                  style={{
+                    backgroundColor: 'var(--gray-4)',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                  }}
+                >
+                  src/App.tsx
+                </code>{' '}
+                and save to test HMR
+              </Text>
+              <Box mt="2">
+                <Button onClick={() => setShowTestPage(true)} variant="soft" color="indigo">
+                  View Radix Themes Components
+                </Button>
+              </Box>
+            </Flex>
+          </Card>
+          <Text size="2" color="gray">
+            Click on the Vite and React logos to learn more
+          </Text>
+        </Flex>
+      </Container>
+    </ThemeProvider>
   );
 }
 
