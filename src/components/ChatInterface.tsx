@@ -12,9 +12,10 @@ export interface Message {
 interface ChatInterfaceProps {
   messages: Message[];
   onSendMessage: (message: string) => void;
+  isLoading?: boolean;
 }
 
-export function ChatInterface({ messages, onSendMessage }: ChatInterfaceProps) {
+export function ChatInterface({ messages, onSendMessage, isLoading = false }: ChatInterfaceProps) {
   const [inputValue, setInputValue] = useState('');
 
   const handleSendMessage = () => {
@@ -94,6 +95,35 @@ export function ChatInterface({ messages, onSendMessage }: ChatInterfaceProps) {
               </Flex>
             ))
           )}
+          {isLoading && (
+            <Flex
+              direction="column"
+              p="3"
+              style={{
+                borderRadius: 'var(--radius-3)',
+                backgroundColor: 'var(--gray-3)',
+                alignSelf: 'flex-start',
+                maxWidth: '80%',
+              }}
+            >
+              <Flex align="center" gap="2" mb="1">
+                <Avatar size="1" src="/ai-avatar.png" fallback="AI" color="cyan" />
+                <Box style={{ fontSize: 'var(--font-size-1)', color: 'var(--gray-11)' }}>
+                  AI Assistant
+                </Box>
+                <Box
+                  style={{
+                    fontSize: 'var(--font-size-1)',
+                    color: 'var(--gray-8)',
+                    marginLeft: 'auto',
+                  }}
+                >
+                  {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </Box>
+              </Flex>
+              <Box style={{ whiteSpace: 'pre-wrap' }}>Thinking...</Box>
+            </Flex>
+          )}
         </Flex>
       </ScrollArea>
 
@@ -108,10 +138,11 @@ export function ChatInterface({ messages, onSendMessage }: ChatInterfaceProps) {
           onKeyDown={handleKeyDown}
           size="3"
           style={{ flexGrow: 1, resize: 'none' }}
+          disabled={isLoading}
         />
         <Button
           onClick={handleSendMessage}
-          disabled={!inputValue.trim()}
+          disabled={!inputValue.trim() || isLoading}
           variant="solid"
           color="indigo"
           size="3"

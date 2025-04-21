@@ -1,5 +1,6 @@
 import { Box, Flex, Theme } from '@radix-ui/themes';
 import { useCallback, useState } from 'react';
+import { useSendChatMessage } from '../api/chat/chatApi';
 import { ChatInterface, Message } from './ChatInterface';
 import { Conversation, ConversationsList } from './ConversationsList';
 import { Document, DocumentList } from './DocumentList';
@@ -66,6 +67,10 @@ export function ChatApp() {
   const [messages, setMessages] = useState<Message[]>(mockMessages);
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>('d1');
   const [hasUploadedFiles, setHasUploadedFiles] = useState(false); // Show dropzone first
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Use our chat mutation hook
+  const { mutate: sendQuery, isPending } = useSendChatMessage();
 
   const handleFilesDrop = useCallback((acceptedFiles: File[]) => {
     const newDocuments = acceptedFiles.map(file => ({
@@ -89,28 +94,52 @@ export function ChatApp() {
     setSelectedDocumentId(documentId);
   }, []);
 
-  const handleSendMessage = useCallback((text: string) => {
-    const newUserMessage: Message = {
-      id: generateId(),
-      text,
-      sender: 'user',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    };
-
-    setMessages(prev => [...prev, newUserMessage]);
-
-    // Simulate AI response after a short delay
-    setTimeout(() => {
-      const newAiMessage: Message = {
+  const handleSendMessage = useCallback(
+    (text: string) => {
+      const newUserMessage: Message = {
         id: generateId(),
-        text: `I'm analyzing your question about "${text}". This is a simulated response as this is just a demo application.`,
-        sender: 'ai',
+        text,
+        sender: 'user',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
 
-      setMessages(prev => [...prev, newAiMessage]);
-    }, 1000);
-  }, []);
+      setMessages(prev => [...prev, newUserMessage]);
+      setIsLoading(true);
+
+      // Call the backend API with the user's message
+      sendQuery(
+        { query: text },
+        {
+          onSuccess: data => {
+            // Create a new AI message with the llmResponse from the backend
+            const newAiMessage: Message = {
+              id: generateId(),
+              text: data.llmResponse || "I couldn't find an answer to your question.",
+              sender: 'ai',
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            };
+
+            setMessages(prev => [...prev, newAiMessage]);
+            setIsLoading(false);
+          },
+          onError: error => {
+            // Handle error by showing an error message
+            const errorMessage: Message = {
+              id: generateId(),
+              text: 'Sorry, I encountered an error processing your request. Please try again.',
+              sender: 'ai',
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            };
+
+            setMessages(prev => [...prev, errorMessage]);
+            setIsLoading(false);
+            console.error('Error querying the API:', error);
+          },
+        }
+      );
+    },
+    [sendQuery]
+  );
 
   const handleSelectConversation = useCallback((conversationId: string) => {
     setConversations(prev =>
@@ -192,7 +221,11 @@ export function ChatApp() {
 
           {/* Center - Chat Interface */}
           <Box style={{ flexGrow: 1 }}>
-            <ChatInterface messages={messages} onSendMessage={handleSendMessage} />
+            <ChatInterface
+              messages={messages}
+              onSendMessage={handleSendMessage}
+              isLoading={isPending || isLoading}
+            />
           </Box>
 
           {/* Right sidebar - Conversations List */}
