@@ -1,6 +1,7 @@
 import { Box, Flex, Theme } from '@radix-ui/themes';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSendChatMessage } from '../api/chat/chatApi';
+import { DocumentResponse, useDocuments } from '../api/document/documentApi';
 import { ChatInterface, Message } from './ChatInterface';
 import { Conversation, ConversationsList } from './ConversationsList';
 import { Document, DocumentList } from './DocumentList';
@@ -9,11 +10,11 @@ import { FileDropzone } from './FileDropzone';
 // Helper function to generate a unique ID
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-// Sample data
+// Sample data for fallback
 const mockDocuments: Document[] = [
   { id: 'd1', name: 'Financial Report 2023.pdf', size: '2.4 MB', date: 'Apr 12, 2025' },
-  { id: 'd2', name: 'Project Proposal.pdf', size: '1.7 MB', date: 'Apr 10, 2025' },
-  { id: 'd3', name: 'User Research Study.pdf', size: '3.2 MB', date: 'Mar 28, 2025' },
+  { id: 'd2', name: 'Project Proposal.pdf', size: '1.7 MB', date: 'Mar 10, 2025' },
+  { id: 'd3', name: 'User Research Study.pdf', size: '3.2 MB', date: 'Feb 28, 2025' },
 ];
 
 const mockConversations: Conversation[] = [];
@@ -64,31 +65,72 @@ const mockMessages: Message[] = [];
 // ];
 
 export function ChatApp() {
-  const [documents, setDocuments] = useState<Document[]>(mockDocuments);
+  const [documents, setDocuments] = useState<Document[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
   const [messages, setMessages] = useState<Message[]>(mockMessages);
-  const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>('d1');
-  const [hasUploadedFiles, setHasUploadedFiles] = useState(false); // Show dropzone first
+  const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
+  const [hasUploadedFiles, setHasUploadedFiles] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   // Use our chat mutation hook
   const { mutate: sendQuery, isPending } = useSendChatMessage();
 
-  const handleFilesDrop = useCallback((acceptedFiles: File[]) => {
-    const newDocuments = acceptedFiles.map(file => ({
-      id: generateId(),
-      name: file.name,
-      size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
-      date: new Date().toLocaleDateString(),
-    }));
+  // Fetch documents from the server
+  const {
+    data: serverDocuments,
+    isLoading: isLoadingDocuments,
+    isError: isDocumentsError,
+  } = useDocuments();
 
-    setDocuments(prev => [...prev, ...newDocuments]);
+  // Format server documents to match our UI model
+  const formatServerDocument = useCallback((doc: DocumentResponse): Document => {
+    const sizeInMb = (doc.fileSize / (1024 * 1024)).toFixed(1);
+    const date = new Date(doc.uploadedAt).toLocaleDateString();
+
+    return {
+      id: doc.id,
+      name: doc.originalFileName,
+      size: `${sizeInMb} MB`,
+      date: date,
+    };
+  }, []);
+
+  // Update documents when server data changes
+  useEffect(() => {
+    if (serverDocuments && serverDocuments.length > 0) {
+      const formattedDocs = serverDocuments.map(formatServerDocument);
+      setDocuments(formattedDocs);
+
+      // Select first document if none selected
+      if (!selectedDocumentId && formattedDocs.length > 0) {
+        setSelectedDocumentId(formattedDocs[0].id);
+      }
+
+      setHasUploadedFiles(true);
+    } else if (documents.length === 0 && !isLoadingDocuments && isDocumentsError) {
+      // Fallback to mock data on error
+      setDocuments(mockDocuments);
+      setSelectedDocumentId('d1');
+      setHasUploadedFiles(true);
+    }
+  }, [
+    serverDocuments,
+    isLoadingDocuments,
+    isDocumentsError,
+    selectedDocumentId,
+    documents.length,
+    formatServerDocument,
+  ]);
+
+  const handleFilesDrop = useCallback((acceptedFiles: File[]) => {
+    // The files have been uploaded in the FileDropzone component
+    // We'll refresh the documents list automatically through the useDocuments hook
+    // Just set hasUploadedFiles to true to show the main UI
     setHasUploadedFiles(true);
   }, []);
 
   const handleAddNewDocument = useCallback(() => {
-    // In a real app, this would open a file picker
-    // For demo purposes, we'll simulate it by using the FileDropzone
+    // Show the dropzone to add new files
     setHasUploadedFiles(false);
   }, []);
 
@@ -150,9 +192,6 @@ export function ChatApp() {
         isActive: conv.id === conversationId,
       }))
     );
-
-    // In a real app, this would load the conversation messages
-    // For demo purposes, we'll just use the mock messages
   }, []);
 
   const handleNewConversation = useCallback(() => {
@@ -199,6 +238,18 @@ export function ChatApp() {
     [conversations]
   );
 
+  // Show loading state for documents
+  if (isLoadingDocuments && !hasUploadedFiles) {
+    return (
+      <Theme accentColor="indigo">
+        <Flex direction="column" align="center" justify="center" py="9" gap="6" height="100vh">
+          <Box>Loading documents...</Box>
+        </Flex>
+      </Theme>
+    );
+  }
+
+  // Show dropzone if no files uploaded or user wants to add more
   if (!hasUploadedFiles) {
     return (
       <Theme accentColor="indigo">

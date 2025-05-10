@@ -1,18 +1,59 @@
 import { UploadIcon } from '@radix-ui/react-icons';
 import { Box, Card, Flex, Heading, Text } from '@radix-ui/themes';
-import { useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { useUploadDocument } from '../api/document/documentApi';
 
 interface FileDropzoneProps {
   onFilesDrop: (files: File[]) => void;
 }
 
 export function FileDropzone({ onFilesDrop }: FileDropzoneProps) {
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+
+  // Use our mutation hook
+  const { mutate: uploadDocument, isPending } = useUploadDocument();
+
   const onDrop = useCallback(
-    (acceptedFiles: File[]) => {
-      onFilesDrop(acceptedFiles);
+    async (acceptedFiles: File[]) => {
+      if (acceptedFiles.length === 0) return;
+
+      setUploading(true);
+      setUploadError(null);
+
+      try {
+        // Upload files one by one
+        const uploadPromises = acceptedFiles.map(
+          file =>
+            new Promise((resolve, reject) => {
+              uploadDocument(
+                { file },
+                {
+                  onSuccess: () => resolve(file),
+                  onError: error => reject(error),
+                }
+              );
+            })
+        );
+
+        await Promise.all(uploadPromises);
+
+        // Invalidate and refetch documents query to get the latest documents
+        queryClient.invalidateQueries({ queryKey: ['documents'] });
+
+        // Call the parent callback to update the UI
+        onFilesDrop(acceptedFiles);
+      } catch (error) {
+        console.error('Upload failed:', error);
+        setUploadError('Failed to upload one or more files. Please try again.');
+      } finally {
+        setUploading(false);
+      }
     },
-    [onFilesDrop]
+    [onFilesDrop, uploadDocument, queryClient]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -20,6 +61,7 @@ export function FileDropzone({ onFilesDrop }: FileDropzoneProps) {
     accept: {
       'application/pdf': ['.pdf'],
     },
+    disabled: uploading,
   });
 
   return (
@@ -30,7 +72,7 @@ export function FileDropzone({ onFilesDrop }: FileDropzoneProps) {
         style={{
           width: '100%',
           maxWidth: '600px',
-          cursor: 'pointer',
+          cursor: uploading ? 'not-allowed' : 'pointer',
           border: isDragActive ? '2px dashed var(--accent-9)' : '2px dashed var(--gray-6)',
           background: isDragActive ? 'var(--accent-3)' : 'var(--gray-2)',
         }}
@@ -51,11 +93,18 @@ export function FileDropzone({ onFilesDrop }: FileDropzoneProps) {
             <UploadIcon width={36} height={36} />
           </Box>
           <Heading size="5" align="center">
-            Drop your PDFs here
+            {uploading ? 'Uploading...' : 'Drop your PDFs here'}
           </Heading>
           <Text as="p" color="gray" align="center">
-            Drag and drop your PDF documents, or click to select files
+            {uploading
+              ? 'Please wait while your files are being uploaded'
+              : 'Drag and drop your PDF documents, or click to select files'}
           </Text>
+          {uploadError && (
+            <Text as="p" color="red" align="center">
+              {uploadError}
+            </Text>
+          )}
           <Text as="p" size="1" color="gray">
             Only PDF files are accepted
           </Text>

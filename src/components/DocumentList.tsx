@@ -1,5 +1,17 @@
-import { FileTextIcon, PlusIcon } from '@radix-ui/react-icons';
-import { Box, Button, Flex, Heading, ScrollArea, Separator, Text } from '@radix-ui/themes';
+import { FileTextIcon, PlusIcon, TrashIcon } from '@radix-ui/react-icons';
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  IconButton,
+  ScrollArea,
+  Separator,
+  Text,
+  Tooltip,
+} from '@radix-ui/themes';
+import { useQueryClient } from '@tanstack/react-query';
+import { useDeleteDocument } from '../api/document/deleteDocument';
 
 export interface Document {
   id: string;
@@ -21,6 +33,27 @@ export function DocumentList({
   onSelectDocument,
   onAddNewDocument,
 }: DocumentListProps) {
+  const queryClient = useQueryClient();
+  const { mutate: deleteDocument } = useDeleteDocument();
+
+  const handleDelete = (e: React.MouseEvent, documentId: string) => {
+    e.stopPropagation(); // Prevent document selection when clicking delete
+    deleteDocument(documentId, {
+      onSuccess: () => {
+        // Force refetch the documents
+        queryClient.invalidateQueries({
+          queryKey: ['documents'],
+          exact: true,
+          refetchType: 'all',
+        });
+      },
+      onError: error => {
+        console.error('Failed to delete document:', error);
+        // Here you could add a toast notification for error feedback
+      },
+    });
+  };
+
   return (
     <Flex direction="column" height="100%" p="4" style={{ borderRight: '1px solid var(--gray-5)' }}>
       <Heading size="4" mb="4">
@@ -58,6 +91,16 @@ export function DocumentList({
                     </Text>
                   </Flex>
                 </Box>
+                <Tooltip content="Delete document">
+                  <IconButton
+                    size="1"
+                    variant="ghost"
+                    color="gray"
+                    onClick={e => handleDelete(e, doc.id)}
+                  >
+                    <TrashIcon />
+                  </IconButton>
+                </Tooltip>
               </Flex>
             </Box>
           ))}
