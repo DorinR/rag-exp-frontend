@@ -1,5 +1,6 @@
 import { FileTextIcon, PlusIcon, TrashIcon } from '@radix-ui/react-icons';
 import {
+  AlertDialog,
   Box,
   Button,
   Flex,
@@ -36,8 +37,7 @@ export function DocumentList({
   const queryClient = useQueryClient();
   const { mutate: deleteDocument } = useDeleteDocument();
 
-  const handleDelete = (e: React.MouseEvent, documentId: string) => {
-    e.stopPropagation(); // Prevent document selection when clicking delete
+  const handleDelete = (documentId: string) => {
     deleteDocument(documentId, {
       onSuccess: () => {
         // Force refetch the documents
@@ -49,7 +49,6 @@ export function DocumentList({
       },
       onError: error => {
         console.error('Failed to delete document:', error);
-        // Here you could add a toast notification for error feedback
       },
     });
   };
@@ -91,16 +90,54 @@ export function DocumentList({
                     </Text>
                   </Flex>
                 </Box>
-                <Tooltip content="Delete document">
-                  <IconButton
-                    size="1"
-                    variant="ghost"
-                    color="gray"
-                    onClick={e => handleDelete(e, doc.id)}
-                  >
-                    <TrashIcon />
-                  </IconButton>
-                </Tooltip>
+                <AlertDialog.Root>
+                  <Tooltip content="Delete document">
+                    <AlertDialog.Trigger>
+                      <IconButton
+                        size="1"
+                        variant="ghost"
+                        color="gray"
+                        onClick={e => e.stopPropagation()}
+                      >
+                        <TrashIcon />
+                      </IconButton>
+                    </AlertDialog.Trigger>
+                  </Tooltip>
+
+                  <AlertDialog.Content style={{ maxWidth: 450 }}>
+                    <AlertDialog.Title>
+                      <Heading as="h3" size="4">
+                        Delete Document
+                      </Heading>
+                    </AlertDialog.Title>
+                    <AlertDialog.Description>
+                      <Text as="p" size="2" color="gray" mb="4">
+                        Are you sure you want to delete "{doc.name}"? This action cannot be undone.
+                      </Text>
+                    </AlertDialog.Description>
+
+                    <Flex gap="3" justify="end">
+                      <AlertDialog.Cancel>
+                        <Button variant="soft" color="gray">
+                          Cancel
+                        </Button>
+                      </AlertDialog.Cancel>
+                      <AlertDialog.Action>
+                        <Button
+                          variant="solid"
+                          color="red"
+                          onClick={e => {
+                            e.stopPropagation();
+                            handleDelete(doc.id);
+                            window.location.reload();
+                          }}
+                        >
+                          Delete
+                        </Button>
+                      </AlertDialog.Action>
+                    </Flex>
+                  </AlertDialog.Content>
+                </AlertDialog.Root>
               </Flex>
             </Box>
           ))}
