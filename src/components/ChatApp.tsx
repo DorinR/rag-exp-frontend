@@ -122,6 +122,7 @@ export function ChatApp() {
     formatServerDocument,
   ]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleFilesDrop = useCallback((_acceptedFiles: File[]) => {
     // The files have been uploaded in the FileDropzone component
     // We'll refresh the documents list automatically through the useDocuments hook
