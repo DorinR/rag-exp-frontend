@@ -63,19 +63,19 @@
   --error-11: #b1242a;
   --error-12: #8f1d25;
 
-  /* Accent (purple) */
-  --accent-1: #fbf1fe;
-  --accent-2: #f4e2fe;
-  --accent-3: #eed3fe;
-  --accent-4: #e5c1f9;
-  --accent-5: #d9a9f2;
-  --accent-6: #c787e7;
-  --accent-7: #b160d9;
-  --accent-8: #9742c4;
-  --accent-9: #8427b0;
-  --accent-10: #752099;
-  --accent-11: #651c85;
-  --accent-12: #4a135d;
+  /* Accent (slate) */
+  --accent-1: #fcfcfd;
+  --accent-2: #f9f9fb;
+  --accent-3: #f0f0f3;
+  --accent-4: #e8e8ec;
+  --accent-5: #e0e0e5;
+  --accent-6: #d7d7dd;
+  --accent-7: #c8c8d0;
+  --accent-8: #b5b5bd;
+  --accent-9: #8e8e96;
+  --accent-10: #84848c;
+  --accent-11: #6e6e76;
+  --accent-12: #1c1c1f;
 
   /* Neutral (mauve) */
   --neutral-1: #fdfcfd;
@@ -165,19 +165,19 @@
   --error-11: #ff9592;
   --error-12: #ffd4d2;
 
-  /* Accent (purple dark) */
-  --accent-1: #18121b;
-  --accent-2: #1e1523;
-  --accent-3: #251a2c;
-  --accent-4: #2d1f35;
-  --accent-5: #35243f;
-  --accent-6: #402b4d;
-  --accent-7: #4f3665;
-  --accent-8: #664282;
-  --accent-9: #8349be;
-  --accent-10: #9053ce;
-  --accent-11: #a969df;
-  --accent-12: #eddbff;
+  /* Accent (slate dark) */
+  --accent-1: #151517;
+  --accent-2: #1a1a1c;
+  --accent-3: #202023;
+  --accent-4: #26262a;
+  --accent-5: #2c2c31;
+  --accent-6: #33333a;
+  --accent-7: #3e3e45;
+  --accent-8: #4c4c55;
+  --accent-9: #8e8e96;
+  --accent-10: #969699;
+  --accent-11: #aeaeb2;
+  --accent-12: #ebebef;
 
   /* Neutral (mauve dark) */
   --neutral-1: #151317;

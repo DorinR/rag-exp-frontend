@@ -45,7 +45,7 @@ export const Navbar = () => {
               </div>
             ) : (
               <div className="flex items-center space-x-3">
-                <Button variant="soft" color="gray" size="2" asChild>
+                <Button variant="soft" size="2" asChild>
                   <Link to="/login">Sign in</Link>
                 </Button>
                 <Button size="2" asChild>

@@ -1,7 +1,7 @@
-import { Box, Button, Card, Flex, Heading, Text } from '@radix-ui/themes';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { Button } from '../../ui/button';
 
 export const LoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -24,36 +24,32 @@ export const LoginForm: React.FC = () => {
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4">
-      <Box className="w-full max-w-[440px]">
-        <Card size="4">
-          <Flex direction="column" gap="5">
-            <Flex direction="column" gap="2">
-              <Heading size="6" weight="bold" align="center">
+      <div className="w-full max-w-[440px]">
+        <div className="bg-card rounded-lg border p-6 shadow-sm">
+          <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-2">
+              <h1 className="text-center text-2xl font-bold text-gray-900 dark:text-gray-100">
                 Sign in to your account
-              </Heading>
-              <Text align="center" size="2" color="gray">
+              </h1>
+              <p className="text-center text-sm text-gray-500 dark:text-gray-400">
                 Don't have an account?{' '}
                 <Link to="/register" className="text-blue-500 hover:text-blue-600">
                   Sign up
                 </Link>
-              </Text>
-            </Flex>
+              </p>
+            </div>
 
-            {error && (
-              <Text color="red" size="2">
-                {error}
-              </Text>
-            )}
+            {error && <p className="text-sm text-red-500">{error}</p>}
 
             <form onSubmit={handleSubmit}>
-              <Flex direction="column" gap="4">
+              <div className="flex flex-col gap-4">
                 <input
                   type="email"
                   placeholder="Email address"
                   value={email}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                   required
-                  className="block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                  className="block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500"
                 />
 
                 <input
@@ -62,17 +58,17 @@ export const LoginForm: React.FC = () => {
                   value={password}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                   required
-                  className="block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                  className="block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500"
                 />
 
-                <Button type="submit" size="3">
+                <Button type="submit" variant="primary" className="w-full">
                   Sign in
                 </Button>
-              </Flex>
+              </div>
             </form>
-          </Flex>
-        </Card>
-      </Box>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

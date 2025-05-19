@@ -41,7 +41,6 @@ export function ConversationsList({
       <Button
         onClick={onNewConversation}
         variant="soft"
-        color="indigo"
         style={{ width: '100%', marginBottom: 'var(--space-4)' }}
       >
         <PlusIcon />

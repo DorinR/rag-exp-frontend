@@ -1,7 +1,7 @@
-import { Box, Button, Card, Flex, Heading, Text } from '@radix-ui/themes';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { Button } from '../../ui/button';
 
 export const RegisterForm: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -26,29 +26,25 @@ export const RegisterForm: React.FC = () => {
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4">
-      <Box className="w-full max-w-[440px]">
-        <Card size="4">
-          <Flex direction="column" gap="5">
-            <Flex direction="column" gap="2">
-              <Heading size="6" weight="bold" align="center">
+      <div className="w-full max-w-[440px]">
+        <div className="bg-card rounded-lg border p-6 shadow-sm">
+          <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-2">
+              <h1 className="text-center text-2xl font-bold text-gray-900 dark:text-gray-100">
                 Create your account
-              </Heading>
-              <Text align="center" size="2" color="gray">
+              </h1>
+              <p className="text-center text-sm text-gray-500 dark:text-gray-400">
                 Already have an account?{' '}
                 <Link to="/login" className="text-blue-500 hover:text-blue-600">
                   Sign in
                 </Link>
-              </Text>
-            </Flex>
+              </p>
+            </div>
 
-            {error && (
-              <Text color="red" size="2">
-                {error}
-              </Text>
-            )}
+            {error && <p className="text-sm text-red-500">{error}</p>}
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <Flex direction="column" gap="4">
+              <div className="flex flex-col gap-4">
                 <div className="relative">
                   <input
                     type="email"
@@ -56,7 +52,7 @@ export const RegisterForm: React.FC = () => {
                     value={email}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                     required
-                    className="block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-blue-600 focus:ring-inset sm:text-sm sm:leading-6"
+                    className="block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500"
                   />
                 </div>
 
@@ -69,11 +65,11 @@ export const RegisterForm: React.FC = () => {
                       setPassword(e.target.value)
                     }
                     required
-                    className="block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-blue-600 focus:ring-inset sm:text-sm sm:leading-6"
+                    className="block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500"
                   />
                 </div>
 
-                <Flex gap="3">
+                <div className="flex gap-3">
                   <div className="relative flex-1">
                     <input
                       type="text"
@@ -82,7 +78,7 @@ export const RegisterForm: React.FC = () => {
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setFirstName(e.target.value)
                       }
-                      className="block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-blue-600 focus:ring-inset sm:text-sm sm:leading-6"
+                      className="block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500"
                     />
                   </div>
 
@@ -94,19 +90,19 @@ export const RegisterForm: React.FC = () => {
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setLastName(e.target.value)
                       }
-                      className="block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-blue-600 focus:ring-inset sm:text-sm sm:leading-6"
+                      className="block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500"
                     />
                   </div>
-                </Flex>
+                </div>
 
-                <Button type="submit" size="3">
+                <Button type="submit" variant="primary" className="w-full">
                   Create account
                 </Button>
-              </Flex>
+              </div>
             </form>
-          </Flex>
-        </Card>
-      </Box>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

@@ -242,7 +242,7 @@ export function ChatApp() {
   // Show loading state for documents
   if (isLoadingDocuments && !hasUploadedFiles) {
     return (
-      <Theme accentColor="indigo">
+      <Theme>
         <Flex direction="column" align="center" justify="center" py="9" gap="6" height="100vh">
           <Box>Loading documents...</Box>
         </Flex>
@@ -253,7 +253,7 @@ export function ChatApp() {
   // Show dropzone if no files uploaded or user wants to add more
   if (!hasUploadedFiles) {
     return (
-      <Theme accentColor="indigo">
+      <Theme>
         <FileDropzone onFilesDrop={handleFilesDrop} />
       </Theme>
     );
@@ -262,7 +262,7 @@ export function ChatApp() {
   const showConversationList = false;
 
   return (
-    <Theme accentColor="indigo">
+    <Theme>
       <Box style={{ height: '100vh', overflow: 'hidden' }}>
         <Flex style={{ height: '100%' }}>
           {/* Left sidebar - Document List */}
