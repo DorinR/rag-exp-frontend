@@ -122,7 +122,7 @@ export function ChatApp() {
     formatServerDocument,
   ]);
 
-  const handleFilesDrop = useCallback((acceptedFiles: File[]) => {
+  const handleFilesDrop = useCallback((_acceptedFiles: File[]) => {
     // The files have been uploaded in the FileDropzone component
     // We'll refresh the documents list automatically through the useDocuments hook
     // Just set hasUploadedFiles to true to show the main UI

@@ -15,7 +15,7 @@ export function FileDropzone({ onFilesDrop }: FileDropzoneProps) {
   const queryClient = useQueryClient();
 
   // Use our mutation hook
-  const { mutate: uploadDocument, isPending } = useUploadDocument();
+  const { mutate: uploadDocument } = useUploadDocument();
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
