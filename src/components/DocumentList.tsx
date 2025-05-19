@@ -129,7 +129,6 @@ export function DocumentList({
                           onClick={e => {
                             e.stopPropagation();
                             handleDelete(doc.id);
-                            window.location.reload();
                           }}
                         >
                           Delete

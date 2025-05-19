@@ -1,7 +1,11 @@
 import axios from 'axios';
 
-// TODO: Replace with actual backend URL from environment variables
-const BACKEND_URL = 'http://localhost:5104';
+// Get the backend URL from environment variables
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
+if (!BACKEND_URL) {
+  throw new Error('VITE_BACKEND_URL environment variable is not set');
+}
 
 export const backendAccessPoint = axios.create({
   baseURL: BACKEND_URL,
