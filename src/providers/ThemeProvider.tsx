@@ -26,7 +26,7 @@ const initialState: ThemeProviderState = {
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
-export function ThemeProvider({
+export const ThemeProvider = ({
   children,
   defaultTheme = 'system',
   storageKey = 'theme',
@@ -35,7 +35,7 @@ export function ThemeProvider({
   scaling = '100%',
   radius = 'medium',
   ...props
-}: ThemeProviderProps) {
+}: ThemeProviderProps) => {
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   );
@@ -73,6 +73,8 @@ export function ThemeProvider({
         : 'light'
       : theme;
 
+  console.log('resolvedTheme', resolvedTheme);
+
   return (
     <ThemeProviderContext.Provider {...props} value={value}>
       <RadixTheme
@@ -86,7 +88,7 @@ export function ThemeProvider({
       </RadixTheme>
     </ThemeProviderContext.Provider>
   );
-}
+};
 
 export const useTheme = () => {
   const context = useContext(ThemeProviderContext);

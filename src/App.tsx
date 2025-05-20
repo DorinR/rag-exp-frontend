@@ -7,7 +7,7 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <ThemeProvider>
+        <ThemeProvider defaultTheme="light">
           <AppRoutes />
         </ThemeProvider>
       </AuthProvider>
