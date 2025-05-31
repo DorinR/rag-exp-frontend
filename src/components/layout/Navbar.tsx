@@ -20,15 +20,14 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="rounded-xl bg-slate-300 shadow-md dark:bg-slate-600">
+    <nav className="border-b-2 border-gray-300 bg-gray-100">
       <div className="mx-auto px-8">
         <div className="flex items-center justify-between py-4">
           <Link to="/" className="flex items-center space-x-4 no-underline">
             <Text size="5" weight="bold" className="text-foreground">
-              semantica.io
+              semantica
             </Text>
           </Link>
-
           <div className="flex items-center space-x-4">
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
@@ -43,16 +42,16 @@ export const Navbar = () => {
                     {user?.email}
                   </Text>
                 </div>
-                <Button onClick={handleLogout} variant="neutral">
+                <Button onClick={handleLogout} variant="soft">
                   Sign out
                 </Button>
               </div>
             ) : (
               <div className="flex items-center space-x-3">
-                <Button variant="neutral">
+                <Button variant="soft">
                   <Link to="/login">Sign in</Link>
                 </Button>
-                <Button variant="primary">
+                <Button variant="soft">
                   <Link to="/register">Sign up</Link>
                 </Button>
               </div>

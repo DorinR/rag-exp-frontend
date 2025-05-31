@@ -12,9 +12,9 @@ const generateId = () => Math.random().toString(36).substr(2, 9);
 
 // Sample data for fallback
 const mockDocuments: Document[] = [
-  { id: 'd1', name: 'Financial Report 2023.pdf', size: '2.4 MB', date: 'Apr 12, 2025' },
-  { id: 'd2', name: 'Project Proposal.pdf', size: '1.7 MB', date: 'Mar 10, 2025' },
-  { id: 'd3', name: 'User Research Study.pdf', size: '3.2 MB', date: 'Feb 28, 2025' },
+    { id: 'd1', name: 'Financial Report 2023.pdf', size: '2.4 MB', date: 'Apr 12, 2025' },
+    { id: 'd2', name: 'Project Proposal.pdf', size: '1.7 MB', date: 'Mar 10, 2025' },
+    { id: 'd3', name: 'User Research Study.pdf', size: '3.2 MB', date: 'Feb 28, 2025' },
 ];
 
 const mockConversations: Conversation[] = [];
@@ -65,238 +65,254 @@ const mockMessages: Message[] = [];
 // ];
 
 export function ChatApp() {
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
-  const [messages, setMessages] = useState<Message[]>(mockMessages);
-  const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
-  const [hasUploadedFiles, setHasUploadedFiles] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+    const [documents, setDocuments] = useState<Document[]>([]);
+    const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
+    const [messages, setMessages] = useState<Message[]>(mockMessages);
+    const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
+    const [hasUploadedFiles, setHasUploadedFiles] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
-  // Use our chat mutation hook
-  const { mutate: sendQuery, isPending } = useSendChatMessage();
+    // Use our chat mutation hook
+    const { mutate: sendQuery, isPending } = useSendChatMessage();
 
-  // Fetch documents from the server
-  const {
-    data: serverDocuments,
-    isLoading: isLoadingDocuments,
-    isError: isDocumentsError,
-  } = useDocuments();
+    // Fetch documents from the server
+    const {
+        data: serverDocuments,
+        isLoading: isLoadingDocuments,
+        isError: isDocumentsError,
+    } = useDocuments();
 
-  // Format server documents to match our UI model
-  const formatServerDocument = useCallback((doc: DocumentResponse): Document => {
-    const sizeInMb = (doc.fileSize / (1024 * 1024)).toFixed(1);
-    const date = new Date(doc.uploadedAt).toLocaleDateString();
+    // Format server documents to match our UI model
+    const formatServerDocument = useCallback((doc: DocumentResponse): Document => {
+        const sizeInMb = (doc.fileSize / (1024 * 1024)).toFixed(1);
+        const date = new Date(doc.uploadedAt).toLocaleDateString();
 
-    return {
-      id: doc.id,
-      name: doc.originalFileName,
-      size: `${sizeInMb} MB`,
-      date: date,
-    };
-  }, []);
+        return {
+            id: doc.id,
+            name: doc.originalFileName,
+            size: `${sizeInMb} MB`,
+            date: date,
+        };
+    }, []);
 
-  // Update documents when server data changes
-  useEffect(() => {
-    if (serverDocuments && serverDocuments.length > 0) {
-      const formattedDocs = serverDocuments.map(formatServerDocument);
-      setDocuments(formattedDocs);
+    // Update documents when server data changes
+    useEffect(() => {
+        if (serverDocuments && serverDocuments.length > 0) {
+            const formattedDocs = serverDocuments.map(formatServerDocument);
+            setDocuments(formattedDocs);
 
-      // Select first document if none selected
-      if (!selectedDocumentId && formattedDocs.length > 0) {
-        setSelectedDocumentId(formattedDocs[0].id);
-      }
+            // Select first document if none selected
+            if (!selectedDocumentId && formattedDocs.length > 0) {
+                setSelectedDocumentId(formattedDocs[0].id);
+            }
 
-      setHasUploadedFiles(true);
-    } else if (documents.length === 0 && !isLoadingDocuments && isDocumentsError) {
-      // Fallback to mock data on error
-      setDocuments(mockDocuments);
-      setSelectedDocumentId('d1');
-      setHasUploadedFiles(true);
-    }
-  }, [
-    serverDocuments,
-    isLoadingDocuments,
-    isDocumentsError,
-    selectedDocumentId,
-    documents.length,
-    formatServerDocument,
-  ]);
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleFilesDrop = useCallback((_acceptedFiles: File[]) => {
-    // The files have been uploaded in the FileDropzone component
-    // We'll refresh the documents list automatically through the useDocuments hook
-    // Just set hasUploadedFiles to true to show the main UI
-    setHasUploadedFiles(true);
-  }, []);
-
-  const handleAddNewDocument = useCallback(() => {
-    // Show the dropzone to add new files
-    setHasUploadedFiles(false);
-  }, []);
-
-  const handleSelectDocument = useCallback((documentId: string) => {
-    setSelectedDocumentId(documentId);
-  }, []);
-
-  const handleSendMessage = useCallback(
-    (text: string) => {
-      const newUserMessage: Message = {
-        id: generateId(),
-        text,
-        sender: 'user',
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      };
-
-      setMessages(prev => [...prev, newUserMessage]);
-      setIsLoading(true);
-
-      // Call the backend API with the user's message
-      sendQuery(
-        { query: text },
-        {
-          onSuccess: data => {
-            // Create a new AI message with the llmResponse from the backend
-            const newAiMessage: Message = {
-              id: generateId(),
-              text: data.llmResponse || "I couldn't find an answer to your question.",
-              sender: 'ai',
-              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            };
-
-            setMessages(prev => [...prev, newAiMessage]);
-            setIsLoading(false);
-          },
-          onError: error => {
-            // Handle error by showing an error message
-            const errorMessage: Message = {
-              id: generateId(),
-              text: 'Sorry, I encountered an error processing your request. Please try again.',
-              sender: 'ai',
-              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            };
-
-            setMessages(prev => [...prev, errorMessage]);
-            setIsLoading(false);
-            console.error('Error querying the API:', error);
-          },
+            setHasUploadedFiles(true);
+        } else if (documents.length === 0 && !isLoadingDocuments && isDocumentsError) {
+            // Fallback to mock data on error
+            setDocuments(mockDocuments);
+            setSelectedDocumentId('d1');
+            setHasUploadedFiles(true);
         }
-      );
-    },
-    [sendQuery]
-  );
+    }, [
+        serverDocuments,
+        isLoadingDocuments,
+        isDocumentsError,
+        selectedDocumentId,
+        documents.length,
+        formatServerDocument,
+    ]);
 
-  const handleSelectConversation = useCallback((conversationId: string) => {
-    setConversations(prev =>
-      prev.map(conv => ({
-        ...conv,
-        isActive: conv.id === conversationId,
-      }))
-    );
-  }, []);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const handleFilesDrop = useCallback((_acceptedFiles: File[]) => {
+        // The files have been uploaded in the FileDropzone component
+        // We'll refresh the documents list automatically through the useDocuments hook
+        // Just set hasUploadedFiles to true to show the main UI
+        setHasUploadedFiles(true);
+    }, []);
 
-  const handleNewConversation = useCallback(() => {
-    const newConversation: Conversation = {
-      id: generateId(),
-      title: 'New Conversation',
-      date: new Date().toLocaleDateString(),
-      messageCount: 0,
-      isActive: true,
-    };
+    const handleAddNewDocument = useCallback(() => {
+        // Show the dropzone to add new files
+        setHasUploadedFiles(false);
+    }, []);
 
-    setConversations(prev =>
-      prev
-        .map(conv => ({
-          ...conv,
-          isActive: false,
-        }))
-        .concat(newConversation)
-    );
+    const handleSelectDocument = useCallback((documentId: string) => {
+        setSelectedDocumentId(documentId);
+    }, []);
 
-    // Clear messages for new conversation
-    setMessages([]);
-  }, []);
+    const handleSendMessage = useCallback(
+        (text: string) => {
+            const newUserMessage: Message = {
+                id: generateId(),
+                text,
+                sender: 'user',
+                timestamp: new Date().toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                }),
+            };
 
-  const handleDeleteConversation = useCallback(
-    (conversationId: string) => {
-      setConversations(prev => prev.filter(conv => conv.id !== conversationId));
+            setMessages(prev => [...prev, newUserMessage]);
+            setIsLoading(true);
 
-      // If the active conversation was deleted, activate the first one if available
-      if (conversations.find(conv => conv.id === conversationId)?.isActive) {
-        if (conversations.length > 1) {
-          const nextConv = conversations.find(conv => conv.id !== conversationId);
-          if (nextConv) {
-            setConversations(prev =>
-              prev.map(conv => ({
-                ...conv,
-                isActive: conv.id === nextConv.id,
-              }))
+            // Call the backend API with the user's message
+            sendQuery(
+                { query: text },
+                {
+                    onSuccess: data => {
+                        // Create a new AI message with the llmResponse from the backend
+                        const newAiMessage: Message = {
+                            id: generateId(),
+                            text: data.llmResponse || "I couldn't find an answer to your question.",
+                            sender: 'ai',
+                            timestamp: new Date().toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                            }),
+                        };
+
+                        setMessages(prev => [...prev, newAiMessage]);
+                        setIsLoading(false);
+                    },
+                    onError: error => {
+                        // Handle error by showing an error message
+                        const errorMessage: Message = {
+                            id: generateId(),
+                            text: 'Sorry, I encountered an error processing your request. Please try again.',
+                            sender: 'ai',
+                            timestamp: new Date().toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                            }),
+                        };
+
+                        setMessages(prev => [...prev, errorMessage]);
+                        setIsLoading(false);
+                        console.error('Error querying the API:', error);
+                    },
+                }
             );
-          }
-        }
-      }
-    },
-    [conversations]
-  );
-
-  // Show loading state for documents
-  if (isLoadingDocuments && !hasUploadedFiles) {
-    return (
-      <Theme>
-        <Flex direction="column" align="center" justify="center" py="9" gap="6" height="100vh">
-          <Box>Loading documents...</Box>
-        </Flex>
-      </Theme>
+        },
+        [sendQuery]
     );
-  }
 
-  // Show dropzone if no files uploaded or user wants to add more
-  if (!hasUploadedFiles) {
-    return (
-      <Theme>
-        <FileDropzone onFilesDrop={handleFilesDrop} />
-      </Theme>
+    const handleSelectConversation = useCallback((conversationId: string) => {
+        setConversations(prev =>
+            prev.map(conv => ({
+                ...conv,
+                isActive: conv.id === conversationId,
+            }))
+        );
+    }, []);
+
+    const handleNewConversation = useCallback(() => {
+        const newConversation: Conversation = {
+            id: generateId(),
+            title: 'New Conversation',
+            date: new Date().toLocaleDateString(),
+            messageCount: 0,
+            isActive: true,
+        };
+
+        setConversations(prev =>
+            prev
+                .map(conv => ({
+                    ...conv,
+                    isActive: false,
+                }))
+                .concat(newConversation)
+        );
+
+        // Clear messages for new conversation
+        setMessages([]);
+    }, []);
+
+    const handleDeleteConversation = useCallback(
+        (conversationId: string) => {
+            setConversations(prev => prev.filter(conv => conv.id !== conversationId));
+
+            // If the active conversation was deleted, activate the first one if available
+            if (conversations.find(conv => conv.id === conversationId)?.isActive) {
+                if (conversations.length > 1) {
+                    const nextConv = conversations.find(conv => conv.id !== conversationId);
+                    if (nextConv) {
+                        setConversations(prev =>
+                            prev.map(conv => ({
+                                ...conv,
+                                isActive: conv.id === nextConv.id,
+                            }))
+                        );
+                    }
+                }
+            }
+        },
+        [conversations]
     );
-  }
 
-  const showConversationList = false;
+    // Show loading state for documents
+    if (isLoadingDocuments && !hasUploadedFiles) {
+        return (
+            <Theme>
+                <Flex
+                    direction="column"
+                    align="center"
+                    justify="center"
+                    py="9"
+                    gap="6"
+                    height="100vh"
+                >
+                    <Box>Loading documents...</Box>
+                </Flex>
+            </Theme>
+        );
+    }
 
-  return (
-    <Theme>
-      <Box style={{ height: '100vh', overflow: 'hidden' }}>
-        <Flex style={{ height: '100%' }}>
-          {/* Left sidebar - Document List */}
-          <Box style={{ width: '250px', borderRight: '1px solid var(--gray-5)' }}>
-            <DocumentList
-              documents={documents}
-              selectedDocumentId={selectedDocumentId}
-              onSelectDocument={handleSelectDocument}
-              onAddNewDocument={handleAddNewDocument}
-            />
-          </Box>
+    // Show dropzone if no files uploaded or user wants to add more
+    if (!hasUploadedFiles) {
+        return (
+            <Theme>
+                <FileDropzone onFilesDrop={handleFilesDrop} />
+            </Theme>
+        );
+    }
 
-          {/* Center - Chat Interface */}
-          <Box style={{ flexGrow: 1 }}>
-            <ChatInterface
-              messages={messages}
-              onSendMessage={handleSendMessage}
-              isLoading={isPending || isLoading}
-            />
-          </Box>
+    const showConversationList = false;
 
-          {/* Right sidebar - Conversations List */}
-          {showConversationList && (
-            <Box style={{ width: '280px', borderLeft: '1px solid var(--gray-5)' }}>
-              <ConversationsList
-                conversations={conversations}
-                onSelectConversation={handleSelectConversation}
-                onNewConversation={handleNewConversation}
-                onDeleteConversation={handleDeleteConversation}
-              />
+    return (
+        <Theme className="h-full">
+            <Box className="h-full">
+                <Flex style={{ height: '95%' }}>
+                    {/* Left sidebar - Document List */}
+                    <Box style={{ width: '250px', borderRight: '1px solid var(--gray-5)' }}>
+                        <DocumentList
+                            documents={documents}
+                            selectedDocumentId={selectedDocumentId}
+                            onSelectDocument={handleSelectDocument}
+                            onAddNewDocument={handleAddNewDocument}
+                        />
+                    </Box>
+
+                    {/* Center - Chat Interface */}
+                    <Box style={{ flexGrow: 1 }}>
+                        <ChatInterface
+                            messages={messages}
+                            onSendMessage={handleSendMessage}
+                            isLoading={isPending || isLoading}
+                        />
+                    </Box>
+
+                    {/* Right sidebar - Conversations List */}
+                    {showConversationList && (
+                        <Box style={{ width: '280px', borderLeft: '1px solid var(--gray-5)' }}>
+                            <ConversationsList
+                                conversations={conversations}
+                                onSelectConversation={handleSelectConversation}
+                                onNewConversation={handleNewConversation}
+                                onDeleteConversation={handleDeleteConversation}
+                            />
+                        </Box>
+                    )}
+                </Flex>
             </Box>
-          )}
-        </Flex>
-      </Box>
-    </Theme>
-  );
+        </Theme>
+    );
 }
