@@ -1,115 +1,86 @@
 import { Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
-import {
-  Badge,
-  Box,
-  Button,
-  Flex,
-  Heading,
-  IconButton,
-  ScrollArea,
-  Separator,
-  Text,
-} from '@radix-ui/themes';
 
 export interface Conversation {
-  id: string;
-  title: string;
-  date: string;
-  messageCount: number;
-  isActive: boolean;
+    id: string;
+    title: string;
+    date: string;
+    messageCount: number;
+    isActive: boolean;
 }
 
 interface ConversationsListProps {
-  conversations: Conversation[];
-  onSelectConversation: (conversationId: string) => void;
-  onNewConversation: () => void;
-  onDeleteConversation: (conversationId: string) => void;
+    conversations: Conversation[];
+    onSelectConversation: (conversationId: string) => void;
+    onNewConversation: () => void;
+    onDeleteConversation: (conversationId: string) => void;
 }
 
 export function ConversationsList({
-  conversations,
-  onSelectConversation,
-  onNewConversation,
-  onDeleteConversation,
+    conversations,
+    onSelectConversation,
+    onNewConversation,
+    onDeleteConversation,
 }: ConversationsListProps) {
-  return (
-    <Flex direction="column" height="100%" p="4" style={{ borderLeft: '1px solid var(--gray-5)' }}>
-      <Heading size="4" mb="4">
-        Conversations
-      </Heading>
+    return (
+        <div className="flex h-full flex-col border-l border-gray-200 p-4">
+            <h2 className="mb-4 text-lg font-semibold">Conversations</h2>
 
-      <Button
-        onClick={onNewConversation}
-        variant="soft"
-        style={{ width: '100%', marginBottom: 'var(--space-4)' }}
-      >
-        <PlusIcon />
-        New Conversation
-      </Button>
-
-      <Separator size="4" my="4" />
-
-      <ScrollArea type="hover" scrollbars="vertical" style={{ flexGrow: 1 }}>
-        <Flex direction="column" gap="2">
-          {conversations.length === 0 ? (
-            <Box
-              style={{
-                textAlign: 'center',
-                padding: 'var(--space-6)',
-                color: 'var(--gray-9)',
-              }}
+            <button
+                onClick={onNewConversation}
+                className="mb-4 flex w-full items-center justify-center gap-2 rounded-md bg-gray-100 px-4 py-2 text-gray-700 transition-colors hover:bg-gray-200"
             >
-              No conversations yet
-            </Box>
-          ) : (
-            conversations.map(conversation => (
-              <Flex
-                key={conversation.id}
-                align="center"
-                p="3"
-                style={{
-                  borderRadius: 'var(--radius-3)',
-                  cursor: 'pointer',
-                  backgroundColor: conversation.isActive ? 'var(--accent-3)' : 'transparent',
-                  border: conversation.isActive
-                    ? '1px solid var(--accent-6)'
-                    : '1px solid transparent',
-                }}
-                onClick={() => onSelectConversation(conversation.id)}
-              >
-                <Box style={{ flexGrow: 1 }}>
-                  <Flex align="center" justify="between" mb="1">
-                    <Text
-                      size="2"
-                      weight={conversation.isActive ? 'bold' : 'regular'}
-                      style={{ wordBreak: 'break-word' }}
-                    >
-                      {conversation.title}
-                    </Text>
-                    <Badge size="1" color="gray">
-                      {conversation.messageCount}
-                    </Badge>
-                  </Flex>
-                  <Text size="1" color="gray">
-                    {conversation.date}
-                  </Text>
-                </Box>
-                <IconButton
-                  size="1"
-                  variant="ghost"
-                  color="gray"
-                  onClick={e => {
-                    e.stopPropagation();
-                    onDeleteConversation(conversation.id);
-                  }}
-                >
-                  <Cross2Icon />
-                </IconButton>
-              </Flex>
-            ))
-          )}
-        </Flex>
-      </ScrollArea>
-    </Flex>
-  );
+                <PlusIcon width={16} height={16} />
+                New Conversation
+            </button>
+
+            <div className="my-4 border-t border-gray-200"></div>
+
+            <div className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 flex-1 overflow-y-auto">
+                <div className="flex flex-col gap-2">
+                    {conversations.length === 0 ? (
+                        <div className="py-6 text-center text-gray-500">No conversations yet</div>
+                    ) : (
+                        conversations.map(conversation => (
+                            <div
+                                key={conversation.id}
+                                className={`flex cursor-pointer items-center rounded-md p-3 transition-all duration-200 hover:bg-gray-50 ${
+                                    conversation.isActive
+                                        ? 'border border-blue-200 bg-blue-50'
+                                        : 'border border-transparent'
+                                }`}
+                                onClick={() => onSelectConversation(conversation.id)}
+                            >
+                                <div className="min-w-0 flex-1">
+                                    <div className="mb-1 flex items-center justify-between">
+                                        <span
+                                            className={`text-sm break-words ${
+                                                conversation.isActive
+                                                    ? 'font-semibold'
+                                                    : 'font-normal'
+                                            } text-gray-900`}
+                                        >
+                                            {conversation.title}
+                                        </span>
+                                        <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-800">
+                                            {conversation.messageCount}
+                                        </span>
+                                    </div>
+                                    <div className="text-xs text-gray-500">{conversation.date}</div>
+                                </div>
+                                <button
+                                    onClick={e => {
+                                        e.stopPropagation();
+                                        onDeleteConversation(conversation.id);
+                                    }}
+                                    className="ml-2 rounded p-1 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
+                                >
+                                    <Cross2Icon width={14} height={14} />
+                                </button>
+                            </div>
+                        ))
+                    )}
+                </div>
+            </div>
+        </div>
+    );
 }

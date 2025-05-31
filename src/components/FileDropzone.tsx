@@ -1,5 +1,4 @@
 import { UploadIcon } from '@radix-ui/react-icons';
-import { Box, Card, Flex, Heading, Text } from '@radix-ui/themes';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -65,53 +64,36 @@ export function FileDropzone({ onFilesDrop }: FileDropzoneProps) {
     });
 
     return (
-        <Flex direction="column" align="center" justify="center" py="9" gap="6" height="100vh">
-            <Card
+        <div className="flex h-screen flex-col items-center justify-center gap-6 py-9">
+            <div
                 {...getRootProps()}
-                size="3"
-                style={{
-                    width: '100%',
-                    maxWidth: '600px',
-                    cursor: uploading ? 'not-allowed' : 'pointer',
-                    border: isDragActive
-                        ? '2px dashed var(--accent-9)'
-                        : '2px dashed var(--gray-6)',
-                    background: isDragActive ? 'var(--accent-3)' : 'var(--gray-2)',
-                }}
+                className={`mx-4 w-full max-w-2xl rounded-lg p-8 shadow-lg transition-all duration-200 ${
+                    uploading
+                        ? 'cursor-not-allowed border-2 border-dashed border-gray-300 bg-gray-50'
+                        : isDragActive
+                          ? 'cursor-pointer border-2 border-dashed border-blue-400 bg-blue-50'
+                          : 'cursor-pointer border-2 border-dashed border-gray-300 bg-white hover:bg-gray-50'
+                }`}
             >
                 <input {...getInputProps()} />
-                <Flex direction="column" align="center" gap="6" py="9">
-                    <Box
-                        style={{
-                            width: '80px',
-                            height: '80px',
-                            borderRadius: '50%',
-                            background: 'var(--gray-3)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }}
-                    >
-                        <UploadIcon width={36} height={36} />
-                    </Box>
-                    <Heading size="5" align="center">
+                <div className="flex flex-col items-center gap-6 py-9">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
+                        <UploadIcon width={36} height={36} className="text-gray-600" />
+                    </div>
+                    <h2 className="text-center text-2xl font-semibold text-gray-900">
                         {uploading ? 'Uploading...' : 'Drop your PDFs here'}
-                    </Heading>
-                    <Text as="p" color="gray" align="center">
+                    </h2>
+                    <p className="text-center text-gray-600">
                         {uploading
                             ? 'Please wait while your files are being uploaded'
                             : 'Drag and drop your PDF documents, or click to select files'}
-                    </Text>
+                    </p>
                     {uploadError && (
-                        <Text as="p" color="red" align="center">
-                            {uploadError}
-                        </Text>
+                        <p className="text-center font-medium text-red-600">{uploadError}</p>
                     )}
-                    <Text as="p" size="1" color="gray">
-                        Only PDF files are accepted
-                    </Text>
-                </Flex>
-            </Card>
-        </Flex>
+                    <p className="text-xs text-gray-500">Only PDF files are accepted</p>
+                </div>
+            </div>
+        </div>
     );
 }

@@ -1,4 +1,3 @@
-import { Box, Flex, Theme } from '@radix-ui/themes';
 import { useCallback, useEffect, useState } from 'react';
 import { useSendChatMessage } from '../api/chat/chatApi';
 import { DocumentResponse, useDocuments } from '../api/document/documentApi';
@@ -251,67 +250,54 @@ export function ChatApp() {
     // Show loading state for documents
     if (isLoadingDocuments && !hasUploadedFiles) {
         return (
-            <Theme>
-                <Flex
-                    direction="column"
-                    align="center"
-                    justify="center"
-                    py="9"
-                    gap="6"
-                    height="100vh"
-                >
-                    <Box>Loading documents...</Box>
-                </Flex>
-            </Theme>
+            <div className="flex h-screen flex-col items-center justify-center gap-6 py-9">
+                <div>Loading documents...</div>
+            </div>
         );
     }
 
     // Show dropzone if no files uploaded or user wants to add more
     if (!hasUploadedFiles) {
-        return (
-            <Theme>
-                <FileDropzone onFilesDrop={handleFilesDrop} />
-            </Theme>
-        );
+        return <FileDropzone onFilesDrop={handleFilesDrop} />;
     }
 
     const showConversationList = false;
 
     return (
-        <Theme className="h-full">
-            <Box className="h-full">
-                <Flex style={{ height: '95%' }}>
+        <div className="h-full">
+            <div className="h-full">
+                <div className="flex h-full">
                     {/* Left sidebar - Document List */}
-                    <Box style={{ width: '250px', borderRight: '1px solid var(--gray-5)' }}>
+                    <div className="w-[250px] border-r border-gray-200">
                         <DocumentList
                             documents={documents}
                             selectedDocumentId={selectedDocumentId}
                             onSelectDocument={handleSelectDocument}
                             onAddNewDocument={handleAddNewDocument}
                         />
-                    </Box>
+                    </div>
 
                     {/* Center - Chat Interface */}
-                    <Box style={{ flexGrow: 1 }}>
+                    <div className="flex-1">
                         <ChatInterface
                             messages={messages}
                             onSendMessage={handleSendMessage}
                             isLoading={isPending || isLoading}
                         />
-                    </Box>
+                    </div>
                     {/* Right sidebar - Conversations List */}
                     {showConversationList && (
-                        <Box style={{ width: '280px', borderLeft: '1px solid var(--gray-5)' }}>
+                        <div className="w-[280px] border-l border-gray-200">
                             <ConversationsList
                                 conversations={conversations}
                                 onSelectConversation={handleSelectConversation}
                                 onNewConversation={handleNewConversation}
                                 onDeleteConversation={handleDeleteConversation}
                             />
-                        </Box>
+                        </div>
                     )}
-                </Flex>
-            </Box>
-        </Theme>
+                </div>
+            </div>
+        </div>
     );
 }

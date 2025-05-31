@@ -1,156 +1,124 @@
 import { ChatBubbleIcon, PaperPlaneIcon } from '@radix-ui/react-icons';
-import { Avatar, Box, Button, Flex, Heading, ScrollArea, TextArea } from '@radix-ui/themes';
 import { useState } from 'react';
 
 export interface Message {
-  id: string;
-  text: string;
-  sender: 'user' | 'ai';
-  timestamp: string;
+    id: string;
+    text: string;
+    sender: 'user' | 'ai';
+    timestamp: string;
 }
 
 interface ChatInterfaceProps {
-  messages: Message[];
-  onSendMessage: (message: string) => void;
-  isLoading?: boolean;
+    messages: Message[];
+    onSendMessage: (message: string) => void;
+    isLoading?: boolean;
 }
 
 export function ChatInterface({ messages, onSendMessage, isLoading = false }: ChatInterfaceProps) {
-  const [inputValue, setInputValue] = useState('');
+    const [inputValue, setInputValue] = useState('');
 
-  const handleSendMessage = () => {
-    if (inputValue.trim()) {
-      onSendMessage(inputValue);
-      setInputValue('');
-    }
-  };
+    const handleSendMessage = () => {
+        if (inputValue.trim()) {
+            onSendMessage(inputValue);
+            setInputValue('');
+        }
+    };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSendMessage();
+        }
+    };
 
-  return (
-    <Flex direction="column" height="100%" p="4">
-      <Flex align="center" gap="2" mb="4">
-        <ChatBubbleIcon width={24} height={24} />
-        <Heading size="4">Chat with your documents</Heading>
-      </Flex>
+    return (
+        <div className="flex h-full flex-col p-4">
+            <div className="mb-4 flex items-center gap-2">
+                <ChatBubbleIcon width={24} height={24} className="text-gray-600" />
+                <h2 className="text-lg font-semibold text-gray-900">Chat with your documents</h2>
+            </div>
 
-      <ScrollArea
-        type="hover"
-        scrollbars="vertical"
-        style={{
-          flexGrow: 1,
-          height: 'calc(100% - 130px)',
-        }}
-      >
-        <Flex direction="column" gap="4" pb="4">
-          {messages.length === 0 ? (
-            <Box
-              style={{
-                textAlign: 'center',
-                padding: 'var(--space-9)',
-                color: 'var(--gray-9)',
-              }}
+            <div
+                className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 flex-1 overflow-y-auto"
+                style={{ height: 'calc(100% - 130px)' }}
             >
-              Ask questions about your documents
-            </Box>
-          ) : (
-            messages.map(message => (
-              <Flex
-                key={message.id}
-                direction="column"
-                p="3"
-                style={{
-                  borderRadius: 'var(--radius-3)',
-                  backgroundColor: message.sender === 'user' ? 'var(--accent-3)' : 'var(--gray-3)',
-                  alignSelf: message.sender === 'user' ? 'flex-end' : 'flex-start',
-                  maxWidth: '80%',
-                }}
-              >
-                <Flex align="center" gap="2" mb="1">
-                  <Avatar
-                    size="1"
-                    src={message.sender === 'user' ? undefined : '/ai-avatar.png'}
-                    fallback={message.sender === 'user' ? 'U' : 'AI'}
-                    color={message.sender === 'user' ? 'indigo' : 'cyan'}
-                  />
-                  <Box style={{ fontSize: 'var(--font-size-1)', color: 'var(--gray-11)' }}>
-                    {message.sender === 'user' ? 'You' : 'AI Assistant'}
-                  </Box>
-                  <Box
-                    style={{
-                      fontSize: 'var(--font-size-1)',
-                      color: 'var(--gray-8)',
-                      marginLeft: 'auto',
-                    }}
-                  >
-                    {message.timestamp}
-                  </Box>
-                </Flex>
-                <Box style={{ whiteSpace: 'pre-wrap' }}>{message.text}</Box>
-              </Flex>
-            ))
-          )}
-          {isLoading && (
-            <Flex
-              direction="column"
-              p="3"
-              style={{
-                borderRadius: 'var(--radius-3)',
-                backgroundColor: 'var(--gray-3)',
-                alignSelf: 'flex-start',
-                maxWidth: '80%',
-              }}
-            >
-              <Flex align="center" gap="2" mb="1">
-                <Avatar size="1" src="/ai-avatar.png" fallback="AI" color="cyan" />
-                <Box style={{ fontSize: 'var(--font-size-1)', color: 'var(--gray-11)' }}>
-                  AI Assistant
-                </Box>
-                <Box
-                  style={{
-                    fontSize: 'var(--font-size-1)',
-                    color: 'var(--gray-8)',
-                    marginLeft: 'auto',
-                  }}
+                <div className="flex flex-col gap-4 pb-4">
+                    {messages.length === 0 ? (
+                        <div className="py-9 text-center text-gray-500">
+                            Ask questions about your documents
+                        </div>
+                    ) : (
+                        messages.map(message => (
+                            <div
+                                key={message.id}
+                                className={`flex max-w-[80%] flex-col rounded-lg p-3 ${
+                                    message.sender === 'user'
+                                        ? 'ml-auto self-end bg-blue-100'
+                                        : 'self-start bg-gray-100'
+                                }`}
+                            >
+                                <div className="mb-1 flex items-center gap-2">
+                                    <div
+                                        className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium ${
+                                            message.sender === 'user'
+                                                ? 'bg-blue-600 text-white'
+                                                : 'bg-cyan-600 text-white'
+                                        }`}
+                                    >
+                                        {message.sender === 'user' ? 'U' : 'AI'}
+                                    </div>
+                                    <span className="text-xs text-gray-600">
+                                        {message.sender === 'user' ? 'You' : 'AI Assistant'}
+                                    </span>
+                                    <span className="ml-auto text-xs text-gray-500">
+                                        {message.timestamp}
+                                    </span>
+                                </div>
+                                <div className="whitespace-pre-wrap text-gray-900">
+                                    {message.text}
+                                </div>
+                            </div>
+                        ))
+                    )}
+                    {isLoading && (
+                        <div className="flex max-w-[80%] flex-col self-start rounded-lg bg-gray-100 p-3">
+                            <div className="mb-1 flex items-center gap-2">
+                                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-cyan-600 text-xs font-medium text-white">
+                                    AI
+                                </div>
+                                <span className="text-xs text-gray-600">AI Assistant</span>
+                                <span className="ml-auto text-xs text-gray-500">
+                                    {new Date().toLocaleTimeString([], {
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                    })}
+                                </span>
+                            </div>
+                            <div className="whitespace-pre-wrap text-gray-900">Thinking...</div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            <div className="sticky bottom-0 flex gap-2">
+                <textarea
+                    placeholder="Ask a question about your documents..."
+                    value={inputValue}
+                    onChange={e => setInputValue(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    disabled={isLoading}
+                    className="flex-1 resize-none rounded-lg border border-gray-300 bg-white p-3 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-gray-50 disabled:text-gray-500"
+                    rows={1}
+                />
+                <button
+                    onClick={handleSendMessage}
+                    disabled={!inputValue.trim() || isLoading}
+                    className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300"
                 >
-                  {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </Box>
-              </Flex>
-              <Box style={{ whiteSpace: 'pre-wrap' }}>Thinking...</Box>
-            </Flex>
-          )}
-        </Flex>
-      </ScrollArea>
-
-      <Flex
-        gap="2"
-        style={{ position: 'sticky', bottom: 0, backgroundColor: 'var(--color-background)' }}
-      >
-        <TextArea
-          placeholder="Ask a question about your documents..."
-          value={inputValue}
-          onChange={e => setInputValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          size="3"
-          style={{ flexGrow: 1, resize: 'none' }}
-          disabled={isLoading}
-        />
-        <Button
-          onClick={handleSendMessage}
-          disabled={!inputValue.trim() || isLoading}
-          variant="solid"
-          color="indigo"
-          size="3"
-        >
-          <PaperPlaneIcon />
-          Send
-        </Button>
-      </Flex>
-    </Flex>
-  );
+                    <PaperPlaneIcon width={16} height={16} />
+                    Send
+                </button>
+            </div>
+        </div>
+    );
 }
