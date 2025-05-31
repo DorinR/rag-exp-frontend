@@ -299,7 +299,6 @@ export function ChatApp() {
                             isLoading={isPending || isLoading}
                         />
                     </Box>
-
                     {/* Right sidebar - Conversations List */}
                     {showConversationList && (
                         <Box style={{ width: '280px', borderLeft: '1px solid var(--gray-5)' }}>
