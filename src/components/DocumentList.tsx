@@ -12,17 +12,11 @@ export interface Document {
 
 interface DocumentListProps {
     documents: Document[];
-    selectedDocumentId: string | null;
     onSelectDocument: (documentId: string) => void;
     onAddNewDocument: () => void;
 }
 
-export function DocumentList({
-    documents,
-    selectedDocumentId,
-    onSelectDocument,
-    onAddNewDocument,
-}: DocumentListProps) {
+export function DocumentList({ documents, onSelectDocument, onAddNewDocument }: DocumentListProps) {
     const queryClient = useQueryClient();
     const { mutate: deleteDocument } = useDeleteDocument();
     const [showDeleteDialog, setShowDeleteDialog] = useState<string | null>(null);
@@ -58,11 +52,7 @@ export function DocumentList({
                         <div
                             key={doc.id}
                             onClick={() => onSelectDocument(doc.id)}
-                            className={`cursor-pointer rounded-md p-3 transition-all duration-200 hover:bg-gray-50 ${
-                                selectedDocumentId === doc.id
-                                    ? 'border border-blue-200 bg-blue-50'
-                                    : 'border border-transparent'
-                            }`}
+                            className="cursor-pointer rounded-md border border-transparent p-3 transition-all duration-200 hover:bg-gray-50"
                         >
                             <div className="flex items-center gap-2">
                                 <FileTextIcon width={20} height={20} className="text-gray-600" />

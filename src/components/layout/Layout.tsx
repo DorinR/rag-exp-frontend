@@ -17,9 +17,5 @@ export const Layout = ({ children }: LayoutProps) => {
 };
 
 const Footer = () => {
-    return (
-        <footer className="flex h-10 items-center justify-center bg-slate-500">
-            <p className="text-sm font-semibold text-white">Copyright 2025 Semantic AI</p>
-        </footer>
-    );
+    return <footer className="flex h-8 items-center justify-center bg-slate-500"></footer>;
 };

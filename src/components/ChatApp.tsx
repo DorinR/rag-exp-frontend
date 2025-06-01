@@ -9,13 +9,6 @@ import { FileDropzone } from './FileDropzone';
 // Helper function to generate a unique ID
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-// Sample data for fallback
-const mockDocuments: Document[] = [
-    { id: 'd1', name: 'Financial Report 2023.pdf', size: '2.4 MB', date: 'Apr 12, 2025' },
-    { id: 'd2', name: 'Project Proposal.pdf', size: '1.7 MB', date: 'Mar 10, 2025' },
-    { id: 'd3', name: 'User Research Study.pdf', size: '3.2 MB', date: 'Feb 28, 2025' },
-];
-
 const mockConversations: Conversation[] = [];
 // const mockConversations: Conversation[] = [
 //   { id: 'c1', title: 'Financial Analysis', date: 'Apr 12, 2025', messageCount: 8, isActive: true },
@@ -67,7 +60,6 @@ export function ChatApp() {
     const [documents, setDocuments] = useState<Document[]>([]);
     const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
     const [messages, setMessages] = useState<Message[]>(mockMessages);
-    const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
     const [hasUploadedFiles, setHasUploadedFiles] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -75,11 +67,7 @@ export function ChatApp() {
     const { mutate: sendQuery, isPending } = useSendChatMessage();
 
     // Fetch documents from the server
-    const {
-        data: serverDocuments,
-        isLoading: isLoadingDocuments,
-        isError: isDocumentsError,
-    } = useDocuments();
+    const { data: serverDocuments, isLoading: isLoadingDocuments } = useDocuments();
 
     // Format server documents to match our UI model
     const formatServerDocument = useCallback((doc: DocumentResponse): Document => {
@@ -99,27 +87,9 @@ export function ChatApp() {
         if (serverDocuments && serverDocuments.length > 0) {
             const formattedDocs = serverDocuments.map(formatServerDocument);
             setDocuments(formattedDocs);
-
-            // Select first document if none selected
-            if (!selectedDocumentId && formattedDocs.length > 0) {
-                setSelectedDocumentId(formattedDocs[0].id);
-            }
-
-            setHasUploadedFiles(true);
-        } else if (documents.length === 0 && !isLoadingDocuments && isDocumentsError) {
-            // Fallback to mock data on error
-            setDocuments(mockDocuments);
-            setSelectedDocumentId('d1');
             setHasUploadedFiles(true);
         }
-    }, [
-        serverDocuments,
-        isLoadingDocuments,
-        isDocumentsError,
-        selectedDocumentId,
-        documents.length,
-        formatServerDocument,
-    ]);
+    }, [serverDocuments, formatServerDocument]);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleFilesDrop = useCallback((_acceptedFiles: File[]) => {
@@ -135,7 +105,8 @@ export function ChatApp() {
     }, []);
 
     const handleSelectDocument = useCallback((documentId: string) => {
-        setSelectedDocumentId(documentId);
+        // Document selection logic can be implemented here if needed
+        console.log('Document selected:', documentId);
     }, []);
 
     const handleSendMessage = useCallback(
@@ -271,7 +242,6 @@ export function ChatApp() {
                     <div className="w-[250px] border-r border-gray-200">
                         <DocumentList
                             documents={documents}
-                            selectedDocumentId={selectedDocumentId}
                             onSelectDocument={handleSelectDocument}
                             onAddNewDocument={handleAddNewDocument}
                         />
