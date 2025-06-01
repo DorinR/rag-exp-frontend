@@ -1,4 +1,4 @@
-import { MoonIcon, SunIcon } from '@radix-ui/react-icons';
+import { ExitIcon, MoonIcon, SunIcon } from '@radix-ui/react-icons';
 import { Avatar, Text } from '@radix-ui/themes';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -44,7 +44,12 @@ export const Navbar = () => {
                                         {user?.email}
                                     </Text>
                                 </div>
-                                <Button onClick={handleLogout} variant="soft">
+                                <Button
+                                    onClick={handleLogout}
+                                    variant="soft"
+                                    icon={ExitIcon}
+                                    iconPosition="left"
+                                >
                                     Sign out
                                 </Button>
                             </div>
