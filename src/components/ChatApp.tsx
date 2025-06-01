@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { useSendChatMessage } from '../api/chat/chatApi';
 import { DocumentResponse, useDocuments } from '../api/document/documentApi';
 import { ChatInterface, Message } from './ChatInterface';
@@ -8,53 +9,6 @@ import { FileDropzone } from './FileDropzone';
 
 // Helper function to generate a unique ID
 const generateId = () => Math.random().toString(36).substr(2, 9);
-
-const mockConversations: Conversation[] = [];
-// const mockConversations: Conversation[] = [
-//   { id: 'c1', title: 'Financial Analysis', date: 'Apr 12, 2025', messageCount: 8, isActive: true },
-//   {
-//     id: 'c2',
-//     title: 'Project Timeline Questions',
-//     date: 'Apr 10, 2025',
-//     messageCount: 5,
-//     isActive: false,
-//   },
-//   {
-//     id: 'c3',
-//     title: 'User Feedback Summary',
-//     date: 'Mar 28, 2025',
-//     messageCount: 12,
-//     isActive: false,
-//   },
-// ];
-
-const mockMessages: Message[] = [];
-// const mockMessages: Message[] = [
-//   {
-//     id: 'm1',
-//     sender: 'user',
-//     text: 'What are the main financial highlights for Q1 2023?',
-//     timestamp: '10:30 AM',
-//   },
-//   {
-//     id: 'm2',
-//     sender: 'ai',
-//     text: 'Based on the financial report, the main highlights for Q1 2023 include:\n\n1. Revenue increased by 15% compared to Q1 2022\n2. Operating expenses decreased by 7%\n3. Net profit margin improved to 22% from 18% last year\n4. Cash reserves increased to $8.5M\n\nWould you like me to provide more details on any specific area?',
-//     timestamp: '10:31 AM',
-//   },
-//   {
-//     id: 'm3',
-//     sender: 'user',
-//     text: 'Can you tell me more about the decrease in operating expenses?',
-//     timestamp: '10:33 AM',
-//   },
-//   {
-//     id: 'm4',
-//     sender: 'ai',
-//     text: 'The report mentions that the 7% decrease in operating expenses was primarily due to:\n\n1. Implementation of remote work policies that reduced office maintenance costs by 32%\n2. Optimization of cloud infrastructure that lowered IT costs by 15%\n3. Renegotiation of vendor contracts resulting in 9% savings\n4. Reduction in travel expenses by 40% by adopting virtual meetings\n\nThe report projects that some of these savings will continue throughout the year, potentially leading to a sustained 5-6% reduction in annual operating expenses.',
-//     timestamp: '10:34 AM',
-//   },
-// ];
 
 export function ChatApp() {
     const [documents, setDocuments] = useState<Document[]>([]);
@@ -144,18 +98,10 @@ export function ChatApp() {
                         setIsLoading(false);
                     },
                     onError: error => {
-                        // Handle error by showing an error message
-                        const errorMessage: Message = {
-                            id: generateId(),
-                            text: 'Sorry, I encountered an error processing your request. Please try again.',
-                            sender: 'ai',
-                            timestamp: new Date().toLocaleTimeString([], {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                            }),
-                        };
-
-                        setMessages(prev => [...prev, errorMessage]);
+                        // Handle error by showing a toast notification
+                        toast.error(
+                            'Sorry, I encountered an error processing your request. Please try again.'
+                        );
                         setIsLoading(false);
                         console.error('Error querying the API:', error);
                     },
