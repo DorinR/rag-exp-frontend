@@ -46,6 +46,10 @@ export default {
         input: 'var(--input)',
         ring: 'var(--ring)',
       },
+      fontFamily: {
+        title: ['Gruppo', 'sans-serif'],
+        body: ['Roboto Flex', 'sans-serif'],
+      },
     },
   },
   plugins: [],
