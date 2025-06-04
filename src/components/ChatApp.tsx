@@ -12,8 +12,8 @@ const generateId = () => Math.random().toString(36).substr(2, 9);
 
 export function ChatApp() {
     const [documents, setDocuments] = useState<Document[]>([]);
-    const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
-    const [messages, setMessages] = useState<Message[]>(mockMessages);
+    const [conversations, setConversations] = useState<Conversation[]>([]);
+    const [messages, setMessages] = useState<Message[]>([]);
     const [hasUploadedFiles, setHasUploadedFiles] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
