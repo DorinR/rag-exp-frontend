@@ -52,7 +52,7 @@ export function DocumentList({ documents, onSelectDocument, onAddNewDocument }: 
                         <div
                             key={doc.id}
                             onClick={() => onSelectDocument(doc.id)}
-                            className="cursor-pointer rounded-md border border-transparent p-3 transition-all duration-200 hover:bg-gray-50"
+                            className="rounded-md border border-transparent bg-slate-50 p-3 transition-all duration-200 hover:bg-slate-100"
                         >
                             <div className="flex items-center gap-2">
                                 <FileTextIcon width={20} height={20} className="text-gray-600" />

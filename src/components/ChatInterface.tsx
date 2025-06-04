@@ -55,7 +55,7 @@ export function ChatInterface({ messages, onSendMessage, isLoading = false }: Ch
                                 className={`flex max-w-[80%] flex-col rounded-lg p-3 ${
                                     message.sender === 'user'
                                         ? 'ml-auto self-end bg-blue-100'
-                                        : 'self-start bg-slate-50'
+                                        : 'self-start rounded-md border bg-slate-50'
                                 }`}
                             >
                                 <div className="mb-1 flex items-center gap-2">
