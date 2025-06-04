@@ -26,7 +26,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref
     ) => {
         const baseStyles =
-            'inline-flex items-center justify-center rounded-lg px-2 py-1 text-sm font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 cursor-pointer hover:bg-gray-400';
+            'inline-flex items-center justify-center rounded-lg px-4 py-1 text-sm font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 cursor-pointer hover:bg-gray-400';
 
         const variantStyles = {
             primary:
@@ -34,7 +34,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             neutral:
                 'bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-2 focus:ring-gray-200 focus:ring-offset-2 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600',
             danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2',
-            soft: 'bg-transparent text-gray-500 hover:bg-gray-200 focus:ring-0 dark:text-gray-300 dark:hover:bg-gray-800',
+            soft: 'bg-transparent text-gray-500 hover:bg-gray-200 focus:ring-0 dark:text-gray-300 dark:hover:bg-gray-800 px-2 py-1',
         };
 
         const animations = 'transition-colors duration-400 ease-in-out';

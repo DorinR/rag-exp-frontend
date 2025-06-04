@@ -1,5 +1,6 @@
 import { ChatBubbleIcon, PaperPlaneIcon } from '@radix-ui/react-icons';
 import { useState } from 'react';
+import { Button } from './ui/button/Button';
 
 export interface Message {
     id: string;
@@ -107,17 +108,18 @@ export function ChatInterface({ messages, onSendMessage, isLoading = false }: Ch
                     onChange={e => setInputValue(e.target.value)}
                     onKeyDown={handleKeyDown}
                     disabled={isLoading}
-                    className="flex-1 resize-none rounded-lg border border-gray-300 bg-white p-3 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-gray-50 disabled:text-gray-500"
+                    className="flex-1 grow resize-none rounded-lg border border-gray-300 bg-white p-3 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-gray-50 disabled:text-gray-500"
                     rows={1}
                 />
-                <button
+                <Button
                     onClick={handleSendMessage}
                     disabled={!inputValue.trim() || isLoading}
-                    className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+                    variant="primary"
+                    icon={PaperPlaneIcon}
+                    iconPosition="left"
                 >
-                    <PaperPlaneIcon width={16} height={16} />
                     Send
-                </button>
+                </Button>
             </div>
         </div>
     );
