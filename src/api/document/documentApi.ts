@@ -68,7 +68,7 @@ export const fetchConversationDocuments = async (
     conversationId: string
 ): Promise<DocumentResponse[]> => {
     const response = await backendAccessPoint.get<DocumentResponse[]>(
-        `/api/Document?conversationId=${conversationId}`
+        `/api/Document/conversation/${conversationId}`
     );
     return response.data;
 };

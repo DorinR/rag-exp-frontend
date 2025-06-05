@@ -4,7 +4,7 @@ import { useQueryAllConversations } from '../api/chat/chatApi';
 import { DocumentResponse, useDocuments } from '../api/document/documentApi';
 import { ChatInterface, Message } from './ChatInterface';
 import { Conversation, ConversationsList } from './ConversationsList';
-import { Document, DocumentList } from './DocumentList';
+import { Document } from './DocumentList';
 import { FileDropzone } from './FileDropzone';
 
 // Helper function to generate a unique ID
@@ -185,13 +185,13 @@ export function ChatApp() {
             <div className="h-full">
                 <div className="flex h-full">
                     {/* Left sidebar - Document List */}
-                    <div className="w-[250px] border-r border-gray-200">
+                    {/* <div className="w-[250px] border-r border-gray-200">
                         <DocumentList
                             documents={documents}
                             onSelectDocument={handleSelectDocument}
                             onAddNewDocument={handleAddNewDocument}
                         />
-                    </div>
+                    </div> */}
 
                     {/* Center - Chat Interface */}
                     <div className="flex-1">
