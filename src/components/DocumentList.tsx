@@ -14,22 +14,36 @@ interface DocumentListProps {
     documents: Document[];
     onSelectDocument: (documentId: string) => void;
     onAddNewDocument: () => void;
+    isLoading?: boolean;
+    conversationId?: string;
 }
 
-export function DocumentList({ documents, onSelectDocument, onAddNewDocument }: DocumentListProps) {
+export function DocumentList({
+    documents,
+    onSelectDocument,
+    onAddNewDocument,
+    isLoading = false,
+    conversationId,
+}: DocumentListProps) {
     const queryClient = useQueryClient();
-    const { mutate: deleteDocument } = useDeleteDocument();
+    const { mutate: deleteDocument } = useDeleteDocument(conversationId);
     const [showDeleteDialog, setShowDeleteDialog] = useState<string | null>(null);
 
     const handleDelete = (documentId: string) => {
         deleteDocument(documentId, {
             onSuccess: () => {
-                // Force refetch the documents
-                queryClient.invalidateQueries({
-                    queryKey: ['documents'],
-                    exact: true,
-                    refetchType: 'all',
-                });
+                // Additional query invalidation if needed
+                if (conversationId) {
+                    queryClient.invalidateQueries({
+                        queryKey: ['documents', conversationId],
+                    });
+                } else {
+                    queryClient.invalidateQueries({
+                        queryKey: ['documents'],
+                        exact: true,
+                        refetchType: 'all',
+                    });
+                }
                 setShowDeleteDialog(null);
             },
             onError: error => {
@@ -38,6 +52,29 @@ export function DocumentList({ documents, onSelectDocument, onAddNewDocument }: 
             },
         });
     };
+
+    if (isLoading) {
+        return (
+            <div className="flex h-full flex-col border-r border-gray-200 p-4">
+                <h2 className="mb-4 text-lg font-semibold">Documents</h2>
+                <div className="flex-1 space-y-3">
+                    {[...Array(3)].map((_, i) => (
+                        <div key={i} className="animate-pulse rounded-md bg-gray-100 p-3">
+                            <div className="flex items-center gap-2">
+                                <div className="h-5 w-5 rounded bg-gray-200"></div>
+                                <div className="flex-1">
+                                    <div className="mb-1 h-4 rounded bg-gray-200"></div>
+                                    <div className="h-3 w-2/3 rounded bg-gray-200"></div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+                <div className="my-4 border-t border-gray-200"></div>
+                <div className="h-10 animate-pulse rounded-md bg-gray-100"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex h-full flex-col border-r border-gray-200 p-4">

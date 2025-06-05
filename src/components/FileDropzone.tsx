@@ -6,9 +6,10 @@ import { useUploadDocument } from '../api/document/documentApi';
 
 interface FileDropzoneProps {
     onFilesDrop: (files: File[]) => void;
+    conversationId?: string;
 }
 
-export function FileDropzone({ onFilesDrop }: FileDropzoneProps) {
+export function FileDropzone({ onFilesDrop, conversationId }: FileDropzoneProps) {
     const [uploading, setUploading] = useState(false);
     const [uploadError, setUploadError] = useState<string | null>(null);
     const queryClient = useQueryClient();
@@ -28,20 +29,26 @@ export function FileDropzone({ onFilesDrop }: FileDropzoneProps) {
                 const uploadPromises = acceptedFiles.map(
                     file =>
                         new Promise((resolve, reject) => {
-                            uploadDocument(
-                                { file },
-                                {
-                                    onSuccess: () => resolve(file),
-                                    onError: error => reject(error),
-                                }
-                            );
+                            const uploadParams = conversationId
+                                ? { conversationId, file }
+                                : ({ file } as any); // Backward compatibility
+
+                            uploadDocument(uploadParams, {
+                                onSuccess: () => resolve(file),
+                                onError: error => reject(error),
+                            });
                         })
                 );
 
                 await Promise.all(uploadPromises);
 
-                // Invalidate and refetch documents query to get the latest documents
-                queryClient.invalidateQueries({ queryKey: ['documents'] });
+                // Invalidate relevant queries
+                if (conversationId) {
+                    queryClient.invalidateQueries({ queryKey: ['documents', conversationId] });
+                    queryClient.invalidateQueries({ queryKey: ['conversation', conversationId] });
+                } else {
+                    queryClient.invalidateQueries({ queryKey: ['documents'] });
+                }
 
                 // Call the parent callback to update the UI
                 onFilesDrop(acceptedFiles);
@@ -52,7 +59,7 @@ export function FileDropzone({ onFilesDrop }: FileDropzoneProps) {
                 setUploading(false);
             }
         },
-        [onFilesDrop, uploadDocument, queryClient]
+        [onFilesDrop, uploadDocument, queryClient, conversationId]
     );
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({

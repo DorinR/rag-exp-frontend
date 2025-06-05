@@ -8,8 +8,8 @@ export const Layout = ({ children }: LayoutProps) => {
     return (
         <div className="flex h-screen flex-col bg-gray-100">
             <Navbar />
-            <div className="mx-auto flex w-full grow px-4">
-                <main className="mt-8 grow">{children}</main>
+            <div className="flex flex-1 overflow-hidden">
+                <main className="flex-1 overflow-hidden">{children}</main>
             </div>
             <Footer />
         </div>

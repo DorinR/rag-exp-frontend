@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { useSendChatMessage } from '../api/chat/chatApi';
+import { useQueryAllConversations } from '../api/chat/chatApi';
 import { DocumentResponse, useDocuments } from '../api/document/documentApi';
 import { ChatInterface, Message } from './ChatInterface';
 import { Conversation, ConversationsList } from './ConversationsList';
@@ -17,8 +17,8 @@ export function ChatApp() {
     const [hasUploadedFiles, setHasUploadedFiles] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Use our chat mutation hook
-    const { mutate: sendQuery, isPending } = useSendChatMessage();
+    // Use the query-all-conversations mutation hook for legacy support
+    const { mutate: sendQuery, isPending } = useQueryAllConversations();
 
     // Fetch documents from the server
     const { data: serverDocuments, isLoading: isLoadingDocuments } = useDocuments();
@@ -78,7 +78,7 @@ export function ChatApp() {
             setMessages(prev => [...prev, newUserMessage]);
             setIsLoading(true);
 
-            // Call the backend API with the user's message
+            // Call the backend API with the user's message using query-all-conversations
             sendQuery(
                 { query: text },
                 {
