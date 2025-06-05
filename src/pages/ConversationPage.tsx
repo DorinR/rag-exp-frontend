@@ -44,7 +44,7 @@ export function ConversationPage() {
             return conversationMessages.map(msg => ({
                 id: msg.id,
                 text: msg.text,
-                sender: msg.role === 'User' ? 'user' : 'ai',
+                sender: msg.role === 'User' ? 'user' : 'ai', // 'Assistant' and 'System' both map to 'ai'
                 timestamp: new Date(msg.timestamp).toLocaleTimeString([], {
                     hour: '2-digit',
                     minute: '2-digit',

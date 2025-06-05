@@ -22,6 +22,47 @@ export interface SendMessageResponse {
     conversationId: string;
 }
 
+// Server response format (with numeric roles)
+interface MessageFromServer {
+    id: string;
+    content: string;
+    role: number;
+    timestamp: string;
+    metadata?: any;
+}
+
+/**
+ * Converts numeric role to string role
+ */
+export const convertRoleToString = (numericRole: number): 'User' | 'Assistant' | 'System' => {
+    switch (numericRole) {
+        case MessageRole.User:
+            return 'User';
+        case MessageRole.Assistant:
+            return 'Assistant';
+        case MessageRole.System:
+            return 'System';
+        default:
+            return 'User'; // Default fallback
+    }
+};
+
+/**
+ * Converts server message format to frontend ConversationMessage format
+ */
+const convertServerMessageToConversationMessage = (
+    serverMessage: MessageFromServer,
+    conversationId: string
+): ConversationMessage => {
+    return {
+        id: serverMessage.id.toString(),
+        text: serverMessage.content,
+        role: convertRoleToString(serverMessage.role),
+        timestamp: serverMessage.timestamp,
+        conversationId: conversationId,
+    };
+};
+
 /**
  * Sends a message to a specific conversation
  */
@@ -82,10 +123,14 @@ export const useSendMessage = () => {
  * Fetches all messages for a specific conversation
  */
 export const fetchMessages = async (conversationId: string): Promise<ConversationMessage[]> => {
-    const response = await backendAccessPoint.get<ConversationMessage[]>(
+    const response = await backendAccessPoint.get<MessageFromServer[]>(
         `/api/conversations/${conversationId}/message`
     );
-    return response.data;
+
+    // Convert server format to frontend format
+    return response.data.map(serverMessage =>
+        convertServerMessageToConversationMessage(serverMessage, conversationId)
+    );
 };
 
 /**

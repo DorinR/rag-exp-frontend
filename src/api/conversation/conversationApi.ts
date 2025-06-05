@@ -6,6 +6,30 @@ import {
     UpdateConversationRequest,
 } from '../../types/conversation';
 import { backendAccessPoint } from '../backendAccessPoint';
+import { convertRoleToString } from '../message/messageApi';
+
+// Server response format for conversation with details (matching your JSON example)
+interface ConversationWithDetailsFromServer {
+    id: string;
+    title: string;
+    createdAt: string;
+    updatedAt: string;
+    documents: Array<{
+        id: number;
+        originalFileName: string;
+        contentType: string;
+        fileSize: number;
+        uploadedAt: string;
+        description: string;
+    }>;
+    messages: Array<{
+        id: number;
+        role: number;
+        content: string;
+        timestamp: string;
+        metadata?: any;
+    }>;
+}
 
 /**
  * Creates a new conversation
@@ -60,10 +84,37 @@ export const useConversations = () => {
 export const fetchConversationById = async (
     conversationId: string
 ): Promise<ConversationWithDetails> => {
-    const response = await backendAccessPoint.get<ConversationWithDetails>(
+    const response = await backendAccessPoint.get<ConversationWithDetailsFromServer>(
         `/api/conversation/${conversationId}`
     );
-    return response.data;
+
+    const serverData = response.data;
+
+    // Convert server format to frontend format
+    const convertedData: ConversationWithDetails = {
+        id: serverData.id,
+        title: serverData.title,
+        createdAt: serverData.createdAt,
+        updatedAt: serverData.updatedAt,
+        documents: serverData.documents.map(doc => ({
+            id: doc.id.toString(),
+            originalFileName: doc.originalFileName,
+            contentType: doc.contentType,
+            fileSize: doc.fileSize,
+            uploadedAt: doc.uploadedAt,
+            description: doc.description,
+            conversationId: conversationId,
+        })),
+        messages: serverData.messages.map(msg => ({
+            id: msg.id.toString(),
+            text: msg.content,
+            role: convertRoleToString(msg.role),
+            timestamp: msg.timestamp,
+            conversationId: conversationId,
+        })),
+    };
+
+    return convertedData;
 };
 
 /**
