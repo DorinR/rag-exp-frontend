@@ -11,7 +11,7 @@ import { FileDropzone } from './FileDropzone';
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
 export function ChatApp() {
-    const [documents, setDocuments] = useState<Document[]>([]);
+    const [, setDocuments] = useState<Document[]>([]);
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [messages, setMessages] = useState<Message[]>([]);
     const [hasUploadedFiles, setHasUploadedFiles] = useState(false);
@@ -53,15 +53,15 @@ export function ChatApp() {
         setHasUploadedFiles(true);
     }, []);
 
-    const handleAddNewDocument = useCallback(() => {
-        // Show the dropzone to add new files
-        setHasUploadedFiles(false);
-    }, []);
+    // const handleAddNewDocument = useCallback(() => {
+    //     // Show the dropzone to add new files
+    //     setHasUploadedFiles(false);
+    // }, []);
 
-    const handleSelectDocument = useCallback((documentId: string) => {
-        // Document selection logic can be implemented here if needed
-        console.log('Document selected:', documentId);
-    }, []);
+    // const handleSelectDocument = useCallback((documentId: string) => {
+    //     // Document selection logic can be implemented here if needed
+    //     console.log('Document selected:', documentId);
+    // }, []);
 
     const handleSendMessage = useCallback(
         (text: string) => {
