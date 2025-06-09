@@ -68,7 +68,7 @@ export function ChatApp() {
             const newUserMessage: Message = {
                 id: generateId(),
                 text,
-                sender: 'user',
+                sender: 'User',
                 timestamp: new Date().toLocaleTimeString([], {
                     hour: '2-digit',
                     minute: '2-digit',
@@ -87,7 +87,7 @@ export function ChatApp() {
                         const newAiMessage: Message = {
                             id: generateId(),
                             text: data.llmResponse || "I couldn't find an answer to your question.",
-                            sender: 'ai',
+                            sender: 'Assistant',
                             timestamp: new Date().toLocaleTimeString([], {
                                 hour: '2-digit',
                                 minute: '2-digit',
