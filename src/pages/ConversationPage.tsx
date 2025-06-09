@@ -29,6 +29,8 @@ export function ConversationPage() {
         conversationId!
     );
 
+    console.log(conversation);
+
     // Hooks for mutations
     const { mutate: sendChatMessage } = useSendChatMessage();
     const { mutate: sendMessage } = useSendMessage();
@@ -44,7 +46,7 @@ export function ConversationPage() {
             return conversationMessages.map(msg => ({
                 id: msg.id,
                 text: msg.text,
-                sender: msg.role === 'User' ? 'user' : 'ai', // 'Assistant' and 'System' both map to 'ai'
+                sender: msg.role,
                 timestamp: new Date(msg.timestamp).toLocaleTimeString([], {
                     hour: '2-digit',
                     minute: '2-digit',
@@ -105,7 +107,7 @@ export function ConversationPage() {
             const newUserMessage: Message = {
                 id: generateId(),
                 text,
-                sender: 'user',
+                sender: 'User',
                 timestamp: new Date().toLocaleTimeString([], {
                     hour: '2-digit',
                     minute: '2-digit',
@@ -144,7 +146,7 @@ export function ConversationPage() {
                                                     text:
                                                         data.llmResponse ||
                                                         "I couldn't find an answer to your question.",
-                                                    sender: 'ai',
+                                                    sender: 'Assistant',
                                                     timestamp: new Date().toLocaleTimeString([], {
                                                         hour: '2-digit',
                                                         minute: '2-digit',

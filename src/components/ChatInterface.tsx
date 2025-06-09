@@ -5,7 +5,7 @@ import { Button } from './ui/button/Button';
 export interface Message {
     id: string;
     text: string;
-    sender: 'user' | 'ai';
+    sender: 'User' | 'Assistant' | 'System';
     timestamp: string;
 }
 
@@ -38,7 +38,6 @@ export function ChatInterface({ messages, onSendMessage, isLoading = false }: Ch
                 <ChatBubbleIcon width={24} height={24} className="text-gray-600" />
                 <h2 className="text-lg font-semibold text-gray-900">Chat with your documents</h2>
             </div>
-
             <div
                 className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 flex-1 overflow-y-auto"
                 style={{ height: 'calc(100% - 130px)' }}
@@ -53,7 +52,7 @@ export function ChatInterface({ messages, onSendMessage, isLoading = false }: Ch
                             <div
                                 key={message.id}
                                 className={`flex max-w-[80%] flex-col rounded-lg p-3 ${
-                                    message.sender === 'user'
+                                    message.sender === 'User'
                                         ? 'ml-auto self-end bg-blue-100'
                                         : 'self-start rounded-md border bg-slate-50'
                                 }`}
@@ -61,15 +60,15 @@ export function ChatInterface({ messages, onSendMessage, isLoading = false }: Ch
                                 <div className="mb-1 flex items-center gap-2">
                                     <div
                                         className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium ${
-                                            message.sender === 'user'
+                                            message.sender === 'User'
                                                 ? 'bg-blue-600 text-white'
                                                 : 'bg-cyan-600 text-white'
                                         }`}
                                     >
-                                        {message.sender === 'user' ? 'U' : 'AI'}
+                                        {message.sender === 'User' ? 'U' : 'AI'}
                                     </div>
                                     <span className="text-xs text-gray-600">
-                                        {message.sender === 'user' ? 'You' : 'AI Assistant'}
+                                        {message.sender === 'User' ? 'You' : 'AI Assistant'}
                                     </span>
                                     <span className="ml-auto text-xs text-gray-500">
                                         {message.timestamp}

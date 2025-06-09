@@ -6,7 +6,6 @@ import {
     UpdateConversationRequest,
 } from '../../types/conversation';
 import { backendAccessPoint } from '../backendAccessPoint';
-import { convertRoleToString } from '../message/messageApi';
 
 // Server response format for conversation with details (matching your JSON example)
 interface ConversationWithDetailsFromServer {
@@ -24,7 +23,7 @@ interface ConversationWithDetailsFromServer {
     }>;
     messages: Array<{
         id: number;
-        role: number;
+        role: 'User' | 'Assistant' | 'System';
         content: string;
         timestamp: string;
         metadata?: any;
@@ -108,7 +107,7 @@ export const fetchConversationById = async (
         messages: serverData.messages.map(msg => ({
             id: msg.id.toString(),
             text: msg.content,
-            role: convertRoleToString(msg.role),
+            role: msg.role,
             timestamp: msg.timestamp,
             conversationId: conversationId,
         })),

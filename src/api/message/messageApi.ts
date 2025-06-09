@@ -26,26 +26,10 @@ export interface SendMessageResponse {
 interface MessageFromServer {
     id: string;
     content: string;
-    role: number;
+    role: 'User' | 'Assistant' | 'System';
     timestamp: string;
     metadata?: any;
 }
-
-/**
- * Converts numeric role to string role
- */
-export const convertRoleToString = (numericRole: number): 'User' | 'Assistant' | 'System' => {
-    switch (numericRole) {
-        case MessageRole.User:
-            return 'User';
-        case MessageRole.Assistant:
-            return 'Assistant';
-        case MessageRole.System:
-            return 'System';
-        default:
-            return 'User'; // Default fallback
-    }
-};
 
 /**
  * Converts server message format to frontend ConversationMessage format
@@ -57,7 +41,7 @@ const convertServerMessageToConversationMessage = (
     return {
         id: serverMessage.id.toString(),
         text: serverMessage.content,
-        role: convertRoleToString(serverMessage.role),
+        role: serverMessage.role,
         timestamp: serverMessage.timestamp,
         conversationId: conversationId,
     };
