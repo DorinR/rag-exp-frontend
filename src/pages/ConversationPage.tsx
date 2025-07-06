@@ -29,8 +29,6 @@ export function ConversationPage() {
         conversationId!
     );
 
-    console.log(conversation);
-
     // Hooks for mutations
     const { mutate: sendChatMessage } = useSendChatMessage();
     const { mutate: sendMessage } = useSendMessage();
