@@ -31,7 +31,7 @@ export interface ChatResponse {
  * Low-level function to make API call to the conversation-scoped query endpoint
  */
 const sendChatMessage = async (request: QueryRequest): Promise<ChatResponse> => {
-    const response = await backendAccessPoint.post<ChatResponse>('/api/rag/query', request);
+    const response = await backendAccessPoint.post<ChatResponse>('/api/query/query', request);
     return response.data;
 };
 
@@ -42,7 +42,7 @@ const queryAllConversations = async (
     request: QueryAllConversationsRequest
 ): Promise<ChatResponse> => {
     const response = await backendAccessPoint.post<ChatResponse>(
-        '/api/rag/query-all-conversations',
+        '/api/query/query-all-conversations',
         request
     );
     return response.data;
