@@ -131,7 +131,7 @@ export function ConversationSidebar() {
                     <Button
                         onClick={handleNewGeneralKnowledgeConversation}
                         disabled={isCreatingGK}
-                        variant="secondary"
+                        variant="soft"
                         icon={ReaderIcon}
                         iconPosition="left"
                         className="w-full"
