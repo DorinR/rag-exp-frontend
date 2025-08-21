@@ -11,6 +11,7 @@ import { FileDropzone } from './FileDropzone';
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
 export function ChatApp() {
+    console.log('🔥 ChatApp is rendering (LEGACY COMPONENT)');
     const [, setDocuments] = useState<Document[]>([]);
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [messages, setMessages] = useState<Message[]>([]);

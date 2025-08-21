@@ -28,6 +28,7 @@ interface ConversationWithDetailsFromServer {
         timestamp: string;
         metadata?: any;
     }>;
+    type: 'DocumentQuery' | 'GeneralKnowledge';
 }
 
 /**
@@ -38,6 +39,19 @@ export const createConversation = async (
 ): Promise<Conversation> => {
     const response = await backendAccessPoint.post<Conversation>('/api/conversation', data);
     return response.data;
+};
+
+/**
+ * Creates a new general knowledge conversation
+ */
+export const createGeneralKnowledgeConversation = async (
+    data: CreateConversationRequest = {}
+): Promise<Conversation> => {
+    const response = await backendAccessPoint.post<Conversation>(
+        '/api/conversation/general-knowledge',
+        data
+    );
+    return response.data; // Backend already returns the correct type
 };
 
 /**
@@ -54,6 +68,24 @@ export const useCreateConversation = () => {
         },
         onError: error => {
             console.error('Error creating conversation:', error);
+        },
+    });
+};
+
+/**
+ * Hook that uses TanStack Query's useMutation to handle general knowledge conversation creation
+ */
+export const useCreateGeneralKnowledgeConversation = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: createGeneralKnowledgeConversation,
+        onSuccess: () => {
+            // Invalidate conversations list to refetch
+            queryClient.invalidateQueries({ queryKey: ['conversations'] });
+        },
+        onError: error => {
+            console.error('Error creating general knowledge conversation:', error);
         },
     });
 };
@@ -111,6 +143,7 @@ export const fetchConversationById = async (
             timestamp: msg.timestamp,
             conversationId: conversationId,
         })),
+        type: serverData.type,
     };
 
     return convertedData;

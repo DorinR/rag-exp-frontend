@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { useSendChatMessage } from '../api/chat/chatApi';
+import { useQueryKnowledgeBase, useSendChatMessage } from '../api/chat/chatApi';
 import { useConversation } from '../api/conversation/conversationApi';
 import { useConversationDocuments } from '../api/document/documentApi';
 import { MessageRole, useSendMessage } from '../api/message/messageApi';
@@ -29,14 +29,12 @@ export function ConversationPage() {
         conversationId!
     );
 
+    console.log('conversation', conversation);
+
     // Hooks for mutations
     const { mutate: sendChatMessage } = useSendChatMessage();
+    const { mutate: queryKnowledgeBase } = useQueryKnowledgeBase();
     const { mutate: sendMessage } = useSendMessage();
-
-    // Redirect if conversation doesn't exist
-    if (!conversationId) {
-        return <Navigate to="/" replace />;
-    }
 
     // Convert conversation messages to chat interface format
     const convertMessagesToChat = useCallback(
@@ -85,7 +83,7 @@ export function ConversationPage() {
         }
     }, [documents]);
 
-    const handleFilesDrop = useCallback((_acceptedFiles: File[]) => {
+    const handleFilesDrop = useCallback(() => {
         // Files are uploaded in FileDropzone component
         setHasUploadedFiles(true);
     }, []);
@@ -115,6 +113,10 @@ export function ConversationPage() {
             setMessages(prev => [...prev, newUserMessage]);
             setIsLoading(true);
 
+            // Determine which query function to use based on conversation type
+            const isGeneralKnowledge = conversation?.type === 'GeneralKnowledge';
+            const queryFunction = isGeneralKnowledge ? queryKnowledgeBase : sendChatMessage;
+
             // First, save the user message
             sendMessage(
                 {
@@ -123,8 +125,8 @@ export function ConversationPage() {
                 },
                 {
                     onSuccess: () => {
-                        // Then send the chat query to get AI response
-                        sendChatMessage(
+                        // Then send the query to get AI response
+                        queryFunction(
                             { query: text, conversationId },
                             {
                                 onSuccess: data => {
@@ -178,8 +180,13 @@ export function ConversationPage() {
                 }
             );
         },
-        [conversationId, sendChatMessage, sendMessage]
+        [conversationId, conversation?.type, sendChatMessage, queryKnowledgeBase, sendMessage]
     );
+
+    // Redirect if conversation doesn't exist
+    if (!conversationId) {
+        return <Navigate to="/" replace />;
+    }
 
     // Loading state
     if (isLoadingConversation) {
@@ -210,25 +217,39 @@ export function ConversationPage() {
         return <Navigate to="/" replace />;
     }
 
-    // Show dropzone if no files uploaded or user wants to add more
-    if (!hasUploadedFiles && !isLoadingDocuments) {
+    // Debug the conversation data
+    console.log('💡 ConversationPage state:', {
+        conversationId,
+        conversation,
+        hasUploadedFiles,
+        isLoadingDocuments,
+        isLoadingConversation,
+    });
+
+    // Show dropzone only for DocumentQuery conversations that don't have files
+    if (!hasUploadedFiles && !isLoadingDocuments && conversation?.type === 'DocumentQuery') {
+        console.log('📤 SHOWING DROPZONE for DocumentQuery conversation');
         return <FileDropzone onFilesDrop={handleFilesDrop} conversationId={conversationId} />;
     }
 
     const uiDocuments = convertDocumentsToUI(documents);
 
+    const isGeneralKnowledge = conversation?.type === 'GeneralKnowledge';
+
     return (
         <div className="flex h-full">
-            {/* Documents sidebar */}
-            <div className="w-[250px] border-r border-gray-200">
-                <DocumentList
-                    documents={uiDocuments}
-                    onSelectDocument={handleSelectDocument}
-                    onAddNewDocument={handleAddNewDocument}
-                    isLoading={isLoadingDocuments}
-                    conversationId={conversationId}
-                />
-            </div>
+            {/* Documents sidebar - only show for regular conversations */}
+            {!isGeneralKnowledge && (
+                <div className="w-[250px] border-r border-gray-200">
+                    <DocumentList
+                        documents={uiDocuments}
+                        onSelectDocument={handleSelectDocument}
+                        onAddNewDocument={handleAddNewDocument}
+                        isLoading={isLoadingDocuments}
+                        conversationId={conversationId}
+                    />
+                </div>
+            )}
 
             {/* Chat interface */}
             <div className="flex-1">
@@ -236,6 +257,7 @@ export function ConversationPage() {
                     messages={messages}
                     onSendMessage={handleSendMessage}
                     isLoading={isLoading}
+                    conversationType={conversation?.type}
                 />
             </div>
         </div>

@@ -13,9 +13,15 @@ interface ChatInterfaceProps {
     messages: Message[];
     onSendMessage: (message: string) => void;
     isLoading?: boolean;
+    conversationType?: 'DocumentQuery' | 'GeneralKnowledge';
 }
 
-export function ChatInterface({ messages, onSendMessage, isLoading = false }: ChatInterfaceProps) {
+export function ChatInterface({
+    messages,
+    onSendMessage,
+    isLoading = false,
+    conversationType = 'DocumentQuery',
+}: ChatInterfaceProps) {
     const [inputValue, setInputValue] = useState('');
 
     const handleSendMessage = () => {
@@ -32,11 +38,30 @@ export function ChatInterface({ messages, onSendMessage, isLoading = false }: Ch
         }
     };
 
+    // Conditional text based on conversation type
+    const getHeaderText = () => {
+        return conversationType === 'GeneralKnowledge'
+            ? 'Ask the Legal Expert'
+            : 'Chat with your documents';
+    };
+
+    const getEmptyStateText = () => {
+        return conversationType === 'GeneralKnowledge'
+            ? 'Ask any legal question'
+            : 'Ask questions about your documents';
+    };
+
+    const getPlaceholderText = () => {
+        return conversationType === 'GeneralKnowledge'
+            ? 'Ask a legal question...'
+            : 'Ask a question about your documents...';
+    };
+
     return (
         <div className="flex h-full flex-col p-4">
             <div className="mb-4 flex items-center gap-2">
                 <ChatBubbleIcon width={24} height={24} className="text-gray-600" />
-                <h2 className="text-lg font-semibold text-gray-900">Chat with your documents</h2>
+                <h2 className="text-lg font-semibold text-gray-900">{getHeaderText()}</h2>
             </div>
             <div
                 className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 flex-1 overflow-y-auto"
@@ -44,9 +69,7 @@ export function ChatInterface({ messages, onSendMessage, isLoading = false }: Ch
             >
                 <div className="flex flex-col gap-4 pb-4">
                     {messages.length === 0 ? (
-                        <div className="py-9 text-center text-gray-500">
-                            Ask questions about your documents
-                        </div>
+                        <div className="py-9 text-center text-gray-500">{getEmptyStateText()}</div>
                     ) : (
                         messages.map(message => (
                             <div
@@ -102,7 +125,7 @@ export function ChatInterface({ messages, onSendMessage, isLoading = false }: Ch
 
             <div className="sticky bottom-0 flex gap-2">
                 <textarea
-                    placeholder="Ask a question about your documents..."
+                    placeholder={getPlaceholderText()}
                     value={inputValue}
                     onChange={e => setInputValue(e.target.value)}
                     onKeyDown={handleKeyDown}

@@ -3,6 +3,7 @@ export interface Conversation {
     title: string;
     createdAt: string;
     updatedAt: string;
+    type?: 'DocumentQuery' | 'GeneralKnowledge'; // Updated to match backend response
 }
 
 export interface ConversationWithDetails extends Conversation {

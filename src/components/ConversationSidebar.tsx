@@ -1,9 +1,10 @@
-import { ChatBubbleIcon, PlusIcon, TrashIcon } from '@radix-ui/react-icons';
+import { ChatBubbleIcon, PlusIcon, ReaderIcon, TrashIcon } from '@radix-ui/react-icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
     useConversations,
     useCreateConversation,
+    useCreateGeneralKnowledgeConversation,
     useDeleteConversation,
 } from '../api/conversation/conversationApi';
 import { Button } from './ui/button/Button';
@@ -14,6 +15,8 @@ export function ConversationSidebar() {
 
     const { data: conversations, isLoading } = useConversations();
     const { mutate: createConversation, isPending: isCreating } = useCreateConversation();
+    const { mutate: createGeneralKnowledgeConversation, isPending: isCreatingGK } =
+        useCreateGeneralKnowledgeConversation();
     const { mutate: deleteConversation, isPending: isDeleting } = useDeleteConversation();
 
     const handleNewConversation = () => {
@@ -26,6 +29,25 @@ export function ConversationSidebar() {
                 },
                 onError: () => {
                     toast.error('Failed to create conversation');
+                },
+            }
+        );
+    };
+
+    const handleNewGeneralKnowledgeConversation = () => {
+        console.log('🎯 Creating general knowledge conversation...');
+        createGeneralKnowledgeConversation(
+            { title: 'General questions about the knowledge base' },
+            {
+                onSuccess: newConversation => {
+                    console.log('✅ General knowledge conversation created:', newConversation);
+                    console.log('🧭 Navigating to:', `/conversations/${newConversation.id}`);
+                    navigate(`/conversations/${newConversation.id}`);
+                    toast.success('General knowledge conversation created');
+                },
+                onError: error => {
+                    console.error('❌ Failed to create general knowledge conversation:', error);
+                    toast.error('Failed to create general knowledge conversation');
                 },
             }
         );
@@ -93,18 +115,30 @@ export function ConversationSidebar() {
 
     return (
         <div className="flex w-80 flex-col border-r border-gray-200 bg-white">
-            {/* Header with New Conversation button */}
+            {/* Header with conversation creation buttons */}
             <div className="border-b border-gray-200 p-4">
-                <Button
-                    onClick={handleNewConversation}
-                    disabled={isCreating}
-                    variant="primary"
-                    icon={PlusIcon}
-                    iconPosition="left"
-                    className="w-full"
-                >
-                    {isCreating ? 'Creating...' : 'New Conversation'}
-                </Button>
+                <div className="space-y-2">
+                    <Button
+                        onClick={handleNewConversation}
+                        disabled={isCreating}
+                        variant="primary"
+                        icon={PlusIcon}
+                        iconPosition="left"
+                        className="w-full"
+                    >
+                        {isCreating ? 'Creating...' : 'New Conversation'}
+                    </Button>
+                    <Button
+                        onClick={handleNewGeneralKnowledgeConversation}
+                        disabled={isCreatingGK}
+                        variant="secondary"
+                        icon={ReaderIcon}
+                        iconPosition="left"
+                        className="w-full"
+                    >
+                        {isCreatingGK ? 'Creating...' : 'Ask Legal Expert'}
+                    </Button>
+                </div>
             </div>
 
             {/* Conversations List */}
