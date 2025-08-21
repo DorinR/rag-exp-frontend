@@ -29,8 +29,6 @@ export function ConversationPage() {
         conversationId!
     );
 
-    console.log('conversation', conversation);
-
     // Hooks for mutations
     const { mutate: sendChatMessage } = useSendChatMessage();
     const { mutate: queryKnowledgeBase } = useQueryKnowledgeBase();
@@ -216,15 +214,6 @@ export function ConversationPage() {
     if (!conversation) {
         return <Navigate to="/" replace />;
     }
-
-    // Debug the conversation data
-    console.log('💡 ConversationPage state:', {
-        conversationId,
-        conversation,
-        hasUploadedFiles,
-        isLoadingDocuments,
-        isLoadingConversation,
-    });
 
     // Show dropzone only for DocumentQuery conversations that don't have files
     if (!hasUploadedFiles && !isLoadingDocuments && conversation?.type === 'DocumentQuery') {
