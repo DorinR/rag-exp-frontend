@@ -1,4 +1,4 @@
-import { ChatBubbleIcon, PlusIcon, ReaderIcon, TrashIcon } from '@radix-ui/react-icons';
+import { ChatBubbleIcon, PlusIcon, TrashIcon } from '@radix-ui/react-icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
@@ -118,7 +118,7 @@ export function ConversationSidebar() {
             {/* Header with conversation creation buttons */}
             <div className="border-b border-gray-200 p-4">
                 <div className="space-y-2">
-                    <Button
+                    {/* <Button
                         onClick={handleNewConversation}
                         disabled={isCreating}
                         variant="primary"
@@ -127,16 +127,16 @@ export function ConversationSidebar() {
                         className="w-full"
                     >
                         {isCreating ? 'Creating...' : 'New Conversation'}
-                    </Button>
+                    </Button> */}
                     <Button
                         onClick={handleNewGeneralKnowledgeConversation}
                         disabled={isCreatingGK}
-                        variant="soft"
-                        icon={ReaderIcon}
+                        variant="primary"
+                        icon={PlusIcon}
                         iconPosition="left"
                         className="w-full"
                     >
-                        {isCreatingGK ? 'Creating...' : 'Ask Legal Expert'}
+                        {isCreatingGK ? 'Creating...' : 'New Conversation'}
                     </Button>
                 </div>
             </div>

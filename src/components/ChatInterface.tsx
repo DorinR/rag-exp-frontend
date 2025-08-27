@@ -1,4 +1,4 @@
-import { ChatBubbleIcon, PaperPlaneIcon } from '@radix-ui/react-icons';
+import { PaperPlaneIcon } from '@radix-ui/react-icons';
 import { useState } from 'react';
 import { Button } from './ui/button/Button';
 
@@ -59,10 +59,6 @@ export function ChatInterface({
 
     return (
         <div className="flex h-full flex-col p-4">
-            <div className="mb-4 flex items-center gap-2">
-                <ChatBubbleIcon width={24} height={24} className="text-gray-600" />
-                <h2 className="text-lg font-semibold text-gray-900">{getHeaderText()}</h2>
-            </div>
             <div
                 className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 flex-1 overflow-y-auto"
                 style={{ height: 'calc(100% - 130px)' }}
