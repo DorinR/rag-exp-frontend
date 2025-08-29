@@ -38,13 +38,6 @@ export function ChatInterface({
         }
     };
 
-    // Conditional text based on conversation type
-    const getHeaderText = () => {
-        return conversationType === 'GeneralKnowledge'
-            ? 'Ask the Legal Expert'
-            : 'Chat with your documents';
-    };
-
     const getEmptyStateText = () => {
         return conversationType === 'GeneralKnowledge'
             ? 'Ask any legal question'

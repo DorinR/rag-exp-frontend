@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
     useConversations,
-    useCreateConversation,
     useCreateGeneralKnowledgeConversation,
     useDeleteConversation,
 } from '../api/conversation/conversationApi';
@@ -14,25 +13,25 @@ export function ConversationSidebar() {
     const { conversationId } = useParams<{ conversationId: string }>();
 
     const { data: conversations, isLoading } = useConversations();
-    const { mutate: createConversation, isPending: isCreating } = useCreateConversation();
+    // const { mutate: createConversation, isPending: isCreating } = useCreateConversation();
     const { mutate: createGeneralKnowledgeConversation, isPending: isCreatingGK } =
         useCreateGeneralKnowledgeConversation();
     const { mutate: deleteConversation, isPending: isDeleting } = useDeleteConversation();
 
-    const handleNewConversation = () => {
-        createConversation(
-            { title: 'New Conversation' },
-            {
-                onSuccess: newConversation => {
-                    navigate(`/conversations/${newConversation.id}`);
-                    toast.success('New conversation created');
-                },
-                onError: () => {
-                    toast.error('Failed to create conversation');
-                },
-            }
-        );
-    };
+    // const handleNewConversation = () => {
+    //     createConversation(
+    //         { title: 'New Conversation' },
+    //         {
+    //             onSuccess: newConversation => {
+    //                 navigate(`/conversations/${newConversation.id}`);
+    //                 toast.success('New conversation created');
+    //             },
+    //             onError: () => {
+    //                 toast.error('Failed to create conversation');
+    //             },
+    //         }
+    //     );
+    // };
 
     const handleNewGeneralKnowledgeConversation = () => {
         console.log('🎯 Creating general knowledge conversation...');
