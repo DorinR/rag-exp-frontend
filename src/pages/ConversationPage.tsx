@@ -45,6 +45,7 @@ export function ConversationPage() {
                     hour: '2-digit',
                     minute: '2-digit',
                 }),
+                sources: msg.sources,
             }));
         },
         []
@@ -128,7 +129,7 @@ export function ConversationPage() {
                             { query: text, conversationId },
                             {
                                 onSuccess: data => {
-                                    // Save the AI response message
+                                    // Save the AI response message with sources
                                     sendMessage(
                                         {
                                             conversationId,
@@ -149,6 +150,7 @@ export function ConversationPage() {
                                                         hour: '2-digit',
                                                         minute: '2-digit',
                                                     }),
+                                                    sources: data.sources,
                                                 };
 
                                                 setMessages(prev => [...prev, newAiMessage]);

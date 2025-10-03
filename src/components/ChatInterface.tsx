@@ -1,5 +1,7 @@
 import { PaperPlaneIcon } from '@radix-ui/react-icons';
 import { useState } from 'react';
+import { DocumentSource } from '../types/conversation';
+import { SourceCitations } from './SourceCitations';
 import { Button } from './ui/button/Button';
 
 export interface Message {
@@ -7,6 +9,7 @@ export interface Message {
     text: string;
     sender: 'User' | 'Assistant' | 'System';
     timestamp: string;
+    sources?: DocumentSource[];
 }
 
 interface ChatInterfaceProps {
@@ -89,6 +92,9 @@ export function ChatInterface({
                                 <div className="whitespace-pre-wrap text-gray-900">
                                     {message.text}
                                 </div>
+                                {message.sender === 'Assistant' && message.sources && (
+                                    <SourceCitations sources={message.sources} />
+                                )}
                             </div>
                         ))
                     )}

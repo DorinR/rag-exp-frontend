@@ -3,6 +3,7 @@ import {
     Conversation,
     ConversationWithDetails,
     CreateConversationRequest,
+    DocumentSource,
     UpdateConversationRequest,
 } from '../../types/conversation';
 import { backendAccessPoint } from '../backendAccessPoint';
@@ -26,7 +27,8 @@ interface ConversationWithDetailsFromServer {
         role: 'User' | 'Assistant' | 'System';
         content: string;
         timestamp: string;
-        metadata?: any;
+        metadata: any | null;
+        sources?: DocumentSource[]; // Source citations for Assistant messages
     }>;
     type: 'DocumentQuery' | 'GeneralKnowledge';
 }
@@ -142,6 +144,7 @@ export const fetchConversationById = async (
             role: msg.role,
             timestamp: msg.timestamp,
             conversationId: conversationId,
+            sources: msg.sources,
         })),
         type: serverData.type,
     };

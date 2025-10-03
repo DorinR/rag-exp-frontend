@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ConversationMessage } from '../../types/conversation';
+import { ConversationMessage, DocumentSource } from '../../types/conversation';
 import { backendAccessPoint } from '../backendAccessPoint';
 
 // Enum values should match the backend C# enum
@@ -28,7 +28,8 @@ interface MessageFromServer {
     content: string;
     role: 'User' | 'Assistant' | 'System';
     timestamp: string;
-    metadata?: any;
+    metadata: any | null;
+    sources?: DocumentSource[]; // Sources for Assistant messages
 }
 
 /**
@@ -44,6 +45,7 @@ const convertServerMessageToConversationMessage = (
         role: serverMessage.role,
         timestamp: serverMessage.timestamp,
         conversationId: conversationId,
+        sources: serverMessage.sources,
     };
 };
 

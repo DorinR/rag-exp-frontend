@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
+import { DocumentSource } from '../../types/conversation';
 import { backendAccessPoint } from '../backendAccessPoint';
 
 // Types to match backend request/response
@@ -13,18 +14,45 @@ export interface QueryAllConversationsRequest {
     limit?: number;
 }
 
+export type QueryIntent = 'Factual' | 'Comprehensive' | 'Exploratory' | 'Comparative';
+
+export interface RetrievalConfig {
+    maxK: number;
+    minSimilarity: number;
+    description: string;
+}
+
 export interface RetrievedChunk {
-    text: string;
+    fullDocumentText: string;
     documentId: string;
     documentTitle: string;
     similarity: number;
 }
 
+/**
+ * Response from the query knowledge base endpoint
+ * Includes LLM response, retrieved chunks, source citations, and retrieval metadata
+ */
 export interface ChatResponse {
     originalQuery: string;
     processedQuery: string;
+    conversationId: number;
     llmResponse: string;
     retrievedChunks: RetrievedChunk[];
+
+    // Query classification (not displayed in UI)
+    intent: QueryIntent;
+    intentReasoning: string;
+
+    // Retrieval configuration used (not displayed in UI)
+    retrievalConfig: RetrievalConfig;
+
+    // Source citations
+    sources: DocumentSource[];
+
+    // Retrieval statistics
+    totalChunks: number;
+    uniqueDocuments: number;
 }
 
 /**
