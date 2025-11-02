@@ -1,37 +1,32 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { useQueryKnowledgeBase, useSendChatMessage } from '../api/chat/chatApi';
 import { useConversation } from '../api/conversation/conversationApi';
-import { useConversationDocuments } from '../api/document/documentApi';
 import { MessageRole, useSendMessage } from '../api/message/messageApi';
 import { ChatInterface, Message } from '../components/ChatInterface';
-import { Document, DocumentList } from '../components/DocumentList';
-import { FileDropzone } from '../components/FileDropzone';
 import { ConversationMessage } from '../types/conversation';
 
 // Helper function to generate a unique ID
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
+/**
+ * ConversationPage component - handles knowledge base queries only
+ * Displays a chat interface for querying the knowledge base with conversation history
+ */
 export function ConversationPage() {
     const { conversationId } = useParams<{ conversationId: string }>();
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [hasUploadedFiles, setHasUploadedFiles] = useState(false);
 
     // Hooks for data fetching
     const {
         data: conversation,
         isLoading: isLoadingConversation,
         error: conversationError,
+        refetch: refetchConversation,
     } = useConversation(conversationId!);
-    const { data: documents, isLoading: isLoadingDocuments } = useConversationDocuments(
-        conversationId!
-    );
 
     // Hooks for mutations
-    const { mutate: sendChatMessage } = useSendChatMessage();
-    const { mutate: queryKnowledgeBase } = useQueryKnowledgeBase();
     const { mutate: sendMessage } = useSendMessage();
 
     // Convert conversation messages to chat interface format
@@ -51,23 +46,6 @@ export function ConversationPage() {
         []
     );
 
-    // Convert documents to UI format
-    const convertDocumentsToUI = useCallback((docs: typeof documents): Document[] => {
-        if (!docs) return [];
-
-        return docs.map(doc => {
-            const sizeInMb = (doc.fileSize / (1024 * 1024)).toFixed(1);
-            const date = new Date(doc.uploadedAt).toLocaleDateString();
-
-            return {
-                id: doc.id,
-                name: doc.originalFileName,
-                size: `${sizeInMb} MB`,
-                date: date,
-            };
-        });
-    }, []);
-
     // Update messages when conversation data changes
     useEffect(() => {
         if (conversation?.messages) {
@@ -75,30 +53,16 @@ export function ConversationPage() {
         }
     }, [conversation?.messages, convertMessagesToChat]);
 
-    // Update documents state when documents change
-    useEffect(() => {
-        if (documents && documents.length > 0) {
-            setHasUploadedFiles(true);
-        }
-    }, [documents]);
-
-    const handleFilesDrop = useCallback(() => {
-        // Files are uploaded in FileDropzone component
-        setHasUploadedFiles(true);
-    }, []);
-
-    const handleAddNewDocument = useCallback(() => {
-        setHasUploadedFiles(false);
-    }, []);
-
-    const handleSelectDocument = useCallback((documentId: string) => {
-        console.log('Document selected:', documentId);
-    }, []);
-
+    /**
+     * Handles sending a message to query the knowledge base
+     * Backend handles: saving user message, querying knowledge base, saving assistant response
+     * @param text - The user's query text
+     */
     const handleSendMessage = useCallback(
         (text: string) => {
             if (!conversationId) return;
 
+            // Optimistic update: immediately show user message
             const newUserMessage: Message = {
                 id: generateId(),
                 text,
@@ -112,11 +76,7 @@ export function ConversationPage() {
             setMessages(prev => [...prev, newUserMessage]);
             setIsLoading(true);
 
-            // Determine which query function to use based on conversation type
-            const isGeneralKnowledge = conversation?.type === 'GeneralKnowledge';
-            const queryFunction = isGeneralKnowledge ? queryKnowledgeBase : sendChatMessage;
-
-            // First, save the user message
+            // Send message to backend (backend handles LLM query and saving assistant response)
             sendMessage(
                 {
                     conversationId,
@@ -124,63 +84,26 @@ export function ConversationPage() {
                 },
                 {
                     onSuccess: () => {
-                        // Then send the query to get AI response
-                        queryFunction(
-                            { query: text, conversationId },
-                            {
-                                onSuccess: data => {
-                                    // Save the AI response message with sources
-                                    sendMessage(
-                                        {
-                                            conversationId,
-                                            data: {
-                                                content: data.llmResponse,
-                                                role: MessageRole.Assistant,
-                                            },
-                                        },
-                                        {
-                                            onSuccess: () => {
-                                                const newAiMessage: Message = {
-                                                    id: generateId(),
-                                                    text:
-                                                        data.llmResponse ||
-                                                        "I couldn't find an answer to your question.",
-                                                    sender: 'Assistant',
-                                                    timestamp: new Date().toLocaleTimeString([], {
-                                                        hour: '2-digit',
-                                                        minute: '2-digit',
-                                                    }),
-                                                    sources: data.sources,
-                                                };
-
-                                                setMessages(prev => [...prev, newAiMessage]);
-                                                setIsLoading(false);
-                                            },
-                                            onError: () => {
-                                                toast.error('Failed to save AI response');
-                                                setIsLoading(false);
-                                            },
-                                        }
-                                    );
-                                },
-                                onError: error => {
-                                    toast.error(
-                                        'Sorry, I encountered an error processing your request. Please try again.'
-                                    );
-                                    setIsLoading(false);
-                                    console.error('Error querying the API:', error);
-                                },
-                            }
-                        );
+                        // Refetch conversation messages to get updated messages including assistant response
+                        refetchConversation()
+                            .then(() => {
+                                setIsLoading(false);
+                            })
+                            .catch(() => {
+                                toast.error('Failed to load updated messages');
+                                setIsLoading(false);
+                            });
                     },
                     onError: () => {
-                        toast.error('Failed to save your message');
+                        toast.error('Failed to send your message. Please try again.');
                         setIsLoading(false);
+                        // Remove optimistic update on error
+                        setMessages(prev => prev.filter(msg => msg.id !== newUserMessage.id));
                     },
                 }
             );
         },
-        [conversationId, conversation?.type, sendChatMessage, queryKnowledgeBase, sendMessage]
+        [conversationId, sendMessage, refetchConversation]
     );
 
     // Redirect if conversation doesn't exist
@@ -217,31 +140,8 @@ export function ConversationPage() {
         return <Navigate to="/" replace />;
     }
 
-    // Show dropzone only for DocumentQuery conversations that don't have files
-    if (!hasUploadedFiles && !isLoadingDocuments && conversation?.type === 'DocumentQuery') {
-        console.log('📤 SHOWING DROPZONE for DocumentQuery conversation');
-        return <FileDropzone onFilesDrop={handleFilesDrop} conversationId={conversationId} />;
-    }
-
-    const uiDocuments = convertDocumentsToUI(documents);
-
-    const isGeneralKnowledge = conversation?.type === 'GeneralKnowledge';
-
     return (
         <div className="flex h-full">
-            {/* Documents sidebar - only show for regular conversations */}
-            {!isGeneralKnowledge && (
-                <div className="w-[250px] border-r border-gray-200">
-                    <DocumentList
-                        documents={uiDocuments}
-                        onSelectDocument={handleSelectDocument}
-                        onAddNewDocument={handleAddNewDocument}
-                        isLoading={isLoadingDocuments}
-                        conversationId={conversationId}
-                    />
-                </div>
-            )}
-
             {/* Chat interface */}
             <div className="flex-1">
                 <ChatInterface

@@ -77,17 +77,6 @@ const queryAllConversations = async (
 };
 
 /**
- * Low-level function to query the knowledge base for general knowledge conversations
- */
-const queryKnowledgeBase = async (request: QueryRequest): Promise<ChatResponse> => {
-    const response = await backendAccessPoint.post<ChatResponse>(
-        '/api/query/query-knowledge-base',
-        request
-    );
-    return response.data;
-};
-
-/**
  * Hook that uses TanStack Query's useMutation to handle conversation-scoped chat API calls
  */
 export const useSendChatMessage = () => {
@@ -107,18 +96,6 @@ export const useQueryAllConversations = () => {
         mutationFn: queryAllConversations,
         onError: error => {
             console.error('Error querying all conversations:', error);
-        },
-    });
-};
-
-/**
- * Hook that uses TanStack Query's useMutation to handle knowledge base queries for general knowledge conversations
- */
-export const useQueryKnowledgeBase = () => {
-    return useMutation({
-        mutationFn: queryKnowledgeBase,
-        onError: error => {
-            console.error('Error querying knowledge base:', error);
         },
     });
 };
