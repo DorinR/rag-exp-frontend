@@ -1,5 +1,7 @@
 import { PaperPlaneIcon } from '@radix-ui/react-icons';
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { DocumentSource } from '../types/conversation';
 import { SourceCitations } from './SourceCitations';
 import { Button } from './ui/button/Button';
@@ -89,8 +91,103 @@ export function ChatInterface({
                                         {message.timestamp}
                                     </span>
                                 </div>
-                                <div className="whitespace-pre-wrap text-gray-900">
-                                    {message.text}
+                                <div className="prose prose-sm max-w-none text-gray-900">
+                                    <ReactMarkdown
+                                        remarkPlugins={[remarkGfm]}
+                                        components={{
+                                            // Customize headings
+                                            h1: props => (
+                                                <h1
+                                                    className="mt-4 mb-2 text-xl font-bold"
+                                                    {...props}
+                                                />
+                                            ),
+                                            h2: props => (
+                                                <h2
+                                                    className="mt-3 mb-2 text-lg font-bold"
+                                                    {...props}
+                                                />
+                                            ),
+                                            h3: props => (
+                                                <h3
+                                                    className="mt-2 mb-1 text-base font-bold"
+                                                    {...props}
+                                                />
+                                            ),
+                                            // Customize lists
+                                            ul: props => (
+                                                <ul
+                                                    className="mb-2 ml-4 list-disc space-y-1"
+                                                    {...props}
+                                                />
+                                            ),
+                                            ol: props => (
+                                                <ol
+                                                    className="mb-2 ml-4 list-decimal space-y-1"
+                                                    {...props}
+                                                />
+                                            ),
+                                            li: props => <li className="ml-1" {...props} />,
+                                            // Customize paragraphs
+                                            p: props => <p className="mb-2 last:mb-0" {...props} />,
+                                            // Customize code blocks
+                                            code: ({ inline, ...props }: any) =>
+                                                inline ? (
+                                                    <code
+                                                        className="rounded bg-gray-200 px-1.5 py-0.5 font-mono text-sm"
+                                                        {...props}
+                                                    />
+                                                ) : (
+                                                    <code
+                                                        className="mb-2 block overflow-x-auto rounded-md bg-gray-100 p-3 font-mono text-sm"
+                                                        {...props}
+                                                    />
+                                                ),
+                                            // Customize blockquotes
+                                            blockquote: props => (
+                                                <blockquote
+                                                    className="my-2 border-l-4 border-gray-300 pl-4 italic"
+                                                    {...props}
+                                                />
+                                            ),
+                                            // Customize links
+                                            a: props => (
+                                                <a
+                                                    className="text-blue-600 hover:underline"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    {...props}
+                                                />
+                                            ),
+                                            // Customize tables
+                                            table: props => (
+                                                <table
+                                                    className="my-2 border-collapse border border-gray-300"
+                                                    {...props}
+                                                />
+                                            ),
+                                            th: props => (
+                                                <th
+                                                    className="border border-gray-300 bg-gray-100 px-3 py-2 font-semibold"
+                                                    {...props}
+                                                />
+                                            ),
+                                            td: props => (
+                                                <td
+                                                    className="border border-gray-300 px-3 py-2"
+                                                    {...props}
+                                                />
+                                            ),
+                                            // Customize strong (bold)
+                                            strong: props => (
+                                                <strong className="font-bold" {...props} />
+                                            ),
+                                            // Customize emphasis (italic)
+                                            em: props => <em className="italic" {...props} />,
+                                        }}
+                                    >
+                                        {message.text}
+                                    </ReactMarkdown>
                                 </div>
                                 {message.sender === 'Assistant' && message.sources && (
                                     <SourceCitations sources={message.sources} />

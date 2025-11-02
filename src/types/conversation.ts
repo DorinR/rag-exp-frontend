@@ -35,6 +35,7 @@ export interface UpdateConversationRequest {
 export interface DocumentSource {
     documentId: number;
     documentTitle: string;
+    documentLink: string;
     fileName: string | null;
     relevanceScore: number;
     chunksUsed: number;
