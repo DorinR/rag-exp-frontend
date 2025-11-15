@@ -3,14 +3,14 @@ import { DocumentSource } from '../types/conversation';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/hover-card';
 
 interface SourceCitationsProps {
-    sources: DocumentSource[];
+    sources?: DocumentSource[];
 }
 
 /**
  * Displays source citations for assistant messages with hover card previews.
  * Shows document titles as triggers, and displays detailed metadata in hover cards.
  *
- * @param sources - Array of document sources to display
+ * @param sources - Optional array of document sources to display
  */
 export function SourceCitations({ sources }: SourceCitationsProps) {
     if (!sources || sources.length === 0) {

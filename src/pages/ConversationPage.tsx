@@ -41,7 +41,7 @@ export function ConversationPage() {
                     hour: '2-digit',
                     minute: '2-digit',
                 }),
-                sources: msg.sources,
+                sources: msg.sources || undefined, // Convert null to undefined for optional property
             }));
         },
         []
