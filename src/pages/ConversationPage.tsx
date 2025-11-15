@@ -32,6 +32,7 @@ export function ConversationPage() {
     // Convert conversation messages to chat interface format
     const convertMessagesToChat = useCallback(
         (conversationMessages: ConversationMessage[]): Message[] => {
+            if (!conversationMessages) return [];
             return conversationMessages.map(msg => ({
                 id: msg.id,
                 text: msg.text,

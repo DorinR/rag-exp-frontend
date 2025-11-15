@@ -48,7 +48,7 @@ const DashboardRedirect = () => {
 
     // If user has conversations, redirect to the most recent one
     if (conversations && conversations.length > 0) {
-        const mostRecentConversation = conversations.sort(
+        const mostRecentConversation = [...conversations].sort(
             (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
         )[0];
         return <Navigate to={`/conversations/${mostRecentConversation.id}`} replace />;
